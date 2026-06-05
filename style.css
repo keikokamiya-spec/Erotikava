@@ -190,6 +190,7 @@ button {
   border: 1px solid var(--line);
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.45);
+  cursor: pointer;
 }
 
 .menu-toggle span {
@@ -451,15 +452,16 @@ p {
 }
 
 .feature-card {
-  min-height: 360px;
   padding: 34px 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 .feature-card-bg-show {
   position: relative;
   overflow: hidden;
-  min-height: 360px;
   background:
     linear-gradient(rgba(0, 0, 0, 0.52), rgba(0, 0, 0, 0.76)),
     url("img/setc/b.jpg") center / cover no-repeat;
@@ -473,7 +475,6 @@ p {
 .feature-card-bg-vip {
   position: relative;
   overflow: hidden;
-  min-height: 360px;
   background:
     linear-gradient(rgba(0, 0, 0, 0.56), rgba(0, 0, 0, 0.78)),
     url("img/setb/j.jpg") center / cover no-repeat;
@@ -510,21 +511,19 @@ p {
 }
 
 .feature-card-media-only {
-  align-self: start;
   display: block;
-  height: fit-content;
-  min-height: 0;
   padding: 0;
   overflow: hidden;
 }
 
 .feature-card-media-only .feature-card-image {
   width: 100%;
-  height: auto;
+  height: 100%;
   aspect-ratio: auto;
   margin-bottom: 0;
   border-radius: 8px;
   object-fit: contain;
+  background: #1a1a1a;
   padding: 0;
 }
 
@@ -682,18 +681,15 @@ p {
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: var(--panel);
+  background: #000000;
   scroll-snap-align: start;
 }
 
 .news-card img {
   width: 100%;
-  aspect-ratio: 3 / 2;
+  aspect-ratio: 891 / 630;
   object-fit: cover;
-}
-
-.news-card h3 {
-  padding: 18px;
+  background: #000000;
 }
 
 .contact-panel {
@@ -1072,6 +1068,11 @@ p {
     transform: translateY(0);
   }
 
+  .site-nav.is-open a {
+    font-size: 1.3rem;
+    padding: 12px 0;
+  }
+
   .feature-grid,
   .menu-card-grid,
   .footer-inner {
@@ -1081,7 +1082,7 @@ p {
   .feature-card,
   .feature-card-bg-show,
   .feature-card-bg-vip {
-    min-height: 420px;
+    min-height: 320px;
   }
 
   .two-column {
