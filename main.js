@@ -116,4 +116,40 @@
       target.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   });
+
+  // Gallery carousel counter
+  const galleryGrid = document.querySelector(".gallery-grid");
+  const galleryCounter = document.querySelector("[data-gallery-counter]");
+  if (galleryGrid && galleryCounter) {
+    const figures = Array.from(galleryGrid.querySelectorAll("figure"));
+    const total = figures.length;
+
+    function updateCounter() {
+      const scrollLeft = galleryGrid.scrollLeft;
+      const cardWidth = galleryGrid.scrollWidth / total;
+      const current = Math.round(scrollLeft / cardWidth) + 1;
+      galleryCounter.textContent = current + " / " + total;
+    }
+
+    galleryGrid.addEventListener("scroll", updateCounter, { passive: true });
+    updateCounter();
+  }
+
+  // News carousel counter
+  const newsSlider = document.querySelector(".news-slider");
+  const newsCounter = document.querySelector("[data-news-counter]");
+  if (newsSlider && newsCounter) {
+    const cards = Array.from(newsSlider.querySelectorAll(".news-card"));
+    const newsTotal = cards.length;
+
+    function updateNewsCounter() {
+      const scrollLeft = newsSlider.scrollLeft;
+      const cardWidth = newsSlider.scrollWidth / newsTotal;
+      const current = Math.round(scrollLeft / cardWidth) + 1;
+      newsCounter.textContent = current + " / " + newsTotal;
+    }
+
+    newsSlider.addEventListener("scroll", updateNewsCounter, { passive: true });
+    updateNewsCounter();
+  }
 })();
