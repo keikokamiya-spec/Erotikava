@@ -1,0 +1,119 @@
+(function () {
+  const header = document.querySelector("[data-header]");
+  const toggle = document.querySelector("[data-menu-toggle]");
+  const nav = document.querySelector("[data-nav]");
+
+  function updateHeader() {
+    if (!header) return;
+    header.classList.toggle("is-scrolled", window.scrollY > 20);
+  }
+
+  updateHeader();
+  window.addEventListener("scroll", updateHeader, { passive: true });
+
+  if (toggle && nav && header) {
+    toggle.addEventListener("click", () => {
+      const isOpen = nav.classList.toggle("is-open");
+      toggle.classList.toggle("is-active", isOpen);
+      header.classList.toggle("is-open", isOpen);
+      document.body.classList.toggle("menu-open", isOpen);
+      toggle.setAttribute("aria-expanded", String(isOpen));
+    });
+
+    nav.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => {
+        nav.classList.remove("is-open");
+        toggle.classList.remove("is-active");
+        header.classList.remove("is-open");
+        document.body.classList.remove("menu-open");
+        toggle.setAttribute("aria-expanded", "false");
+      });
+    });
+  }
+
+  const hero = document.querySelector("[data-hero-slider]");
+  if (hero) {
+    const slides = Array.from(hero.querySelectorAll(".hero-slide"));
+    const prev = hero.querySelector("[data-hero-prev]");
+    const next = hero.querySelector("[data-hero-next]");
+    const dotsRoot = hero.querySelector("[data-hero-dots]");
+    let current = 0;
+    let timer = null;
+
+    const dots = slides.map((_, index) => {
+      const dot = document.createElement("button");
+      dot.type = "button";
+      dot.setAttribute("aria-label", `${index + 1}枚目のスライド`);
+      dot.addEventListener("click", () => {
+        showSlide(index);
+        restart();
+      });
+      dotsRoot.appendChild(dot);
+      return dot;
+    });
+
+    function showSlide(index) {
+      current = (index + slides.length) % slides.length;
+      slides.forEach((slide, slideIndex) => {
+        slide.classList.toggle("is-active", slideIndex === current);
+      });
+      dots.forEach((dot, dotIndex) => {
+        dot.classList.toggle("is-active", dotIndex === current);
+      });
+    }
+
+    function restart() {
+      window.clearInterval(timer);
+      timer = window.setInterval(() => showSlide(current + 1), 5000);
+    }
+
+    prev.addEventListener("click", () => {
+      showSlide(current - 1);
+      restart();
+    });
+    next.addEventListener("click", () => {
+      showSlide(current + 1);
+      restart();
+    });
+
+    showSlide(0);
+    restart();
+  }
+
+  const slider = document.querySelector("[data-card-slider]");
+  const scrollPrev = document.querySelector("[data-scroll-prev]");
+  const scrollNext = document.querySelector("[data-scroll-next]");
+  if (slider && scrollPrev && scrollNext) {
+    const scrollByCard = () => Math.min(380, slider.clientWidth * 0.85);
+    scrollPrev.addEventListener("click", () => slider.scrollBy({ left: -scrollByCard(), behavior: "smooth" }));
+    scrollNext.addEventListener("click", () => slider.scrollBy({ left: scrollByCard(), behavior: "smooth" }));
+  }
+
+  document.querySelectorAll("[data-tabs]").forEach((tabs) => {
+    const buttons = Array.from(tabs.querySelectorAll("[data-tab-button]"));
+    const panels = Array.from(tabs.querySelectorAll("[data-tab-panel]"));
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = button.dataset.tabButton;
+        buttons.forEach((item) => {
+          const active = item === button;
+          item.classList.toggle("is-active", active);
+          item.setAttribute("aria-selected", String(active));
+        });
+        panels.forEach((panel) => {
+          panel.classList.toggle("is-active", panel.dataset.tabPanel === target);
+        });
+      });
+    });
+  });
+
+  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+    anchor.addEventListener("click", (event) => {
+      const target = document.querySelector(anchor.getAttribute("href"));
+      if (!target) return;
+      event.preventDefault();
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+})();
