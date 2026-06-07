@@ -266,6 +266,10 @@ button {
   transform: translate(-50%, -50%);
 }
 
+.hero-caption-line {
+  display: inline;
+}
+
 .hero-arrow {
   position: absolute;
   top: 50%;
@@ -358,6 +362,7 @@ h1 {
 }
 
 h2 {
+  color: #B00000;
   font-size: clamp(2rem, 4vw, 3.4rem);
 }
 
@@ -769,7 +774,7 @@ p {
 
 .page-hero h1 {
   display: inline-block;
-  color: var(--white);
+  color: #B00000;
   font-size: clamp(2.5rem, 7vw, 5.2rem);
 }
 
@@ -1073,35 +1078,39 @@ p {
 
   .site-nav {
     position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
+    top: 76px;
+    right: 16px;
+    bottom: auto;
+    left: auto;
     z-index: 100;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 32px;
-    width: 280px;
-    background: #0a0a0a;
-    border-left: 1px solid var(--line);
-    box-shadow: -8px 0 30px rgba(0, 0, 0, 0.6);
+    align-items: stretch;
+    justify-content: flex-start;
+    width: min(280px, calc(100% - 32px));
+    max-height: calc(100dvh - 92px);
+    gap: 8px;
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.92);
+    box-shadow: var(--shadow);
     opacity: 0;
+    overflow-y: auto;
     visibility: hidden;
-    transform: translateX(100%);
+    transform: translateX(16px);
     transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+  }
+
+  .site-nav a {
+    padding: 10px 0;
+    text-align: right;
   }
 
   .site-nav.is-open {
     opacity: 1;
     visibility: visible;
     transform: translateX(0);
-  }
-
-  .site-nav a {
-    font-size: 1.2rem;
-    padding: 14px 0;
-    color: var(--white);
   }
 
   .feature-grid,
@@ -1113,7 +1122,26 @@ p {
   .feature-card,
   .feature-card-bg-show,
   .feature-card-bg-vip {
-    min-height: 320px;
+    min-height: 0;
+    aspect-ratio: 891 / 630;
+  }
+
+  .feature-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  .feature-card-media-only {
+    display: block;
+    height: auto;
+    padding: 0;
+  }
+
+  .feature-card-media-only .feature-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   .two-column {
@@ -1137,6 +1165,13 @@ p {
     padding: 12px 16px;
   }
 
+  .site-nav {
+    top: 72px;
+    right: 12px;
+    width: min(260px, calc(100% - 24px));
+    max-height: calc(100dvh - 84px);
+  }
+
   .brand-logo {
     min-width: 160px;
     font-size: 2.9rem;
@@ -1151,7 +1186,13 @@ p {
   }
 
   .hero-caption {
-    font-size: clamp(1.8rem, 6.3vw, 2.7rem);
+    width: min(520px, calc(100% - 28px));
+    font-size: clamp(1.9rem, 8.6vw, 2.8rem);
+    line-height: 1.38;
+  }
+
+  .hero-caption-line {
+    display: block;
   }
 
   .hero-arrow {
