@@ -3,13 +3,13 @@
   --paint-glass: rgba(26, 26, 26, 0.88);
   --panel: #111111;
   --panel-soft: #171717;
-  --red: #991f3d;
-  --deep-red: #991f3d;
+  --red: #B00000;
+  --deep-red: #B00000;
   --white: #ffffff;
-  --muted: #cfcfcf;
-  --line: rgba(153, 31, 61, 0.38);
+  --muted: #ffffff;
+  --line: rgba(176, 0, 0, 0.38);
   --shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
-  --text-shadow: 0 2px 0 #8A1538, 0 8px 20px #8A1538;
+  --text-shadow: 0 2px 0 #B00000, 0 8px 20px #B00000;
   --text-shadow-soft: 0 1px 0 #1A1A1A, 0 5px 14px #1A1A1A;
   --script: "Great Vibes", cursive;
   --display: "Shippori Mincho", serif;
@@ -116,8 +116,8 @@ button {
   text-shadow:
     0 2px 0 #1A1A1A,
     0 0 1px rgba(255, 255, 255, 0.88),
-    0 0 12px rgba(153, 31, 61, 0.58),
-    0 0 28px rgba(153, 31, 61, 0.42),
+    0 0 12px rgba(176, 0, 0, 0.58),
+    0 0 28px rgba(176, 0, 0, 0.42),
     0 8px 24px #1A1A1A;
   transform: rotate(-1deg);
 }
@@ -127,7 +127,7 @@ button {
   text-shadow:
     0 2px 0 #1A1A1A,
     0 0 2px rgba(255, 255, 255, 0.72),
-    0 0 16px rgba(153, 31, 61, 0.86);
+    0 0 16px rgba(176, 0, 0, 0.86);
 }
 
 .site-nav {
@@ -173,6 +173,11 @@ button {
   transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
 }
 
+.scroll-controls button,
+.hero-arrow {
+  color: var(--red);
+}
+
 .tab-buttons button:hover,
 .scroll-controls button:hover,
 .hero-arrow:hover {
@@ -198,7 +203,7 @@ button {
   width: 20px;
   height: 2px;
   margin: 5px auto;
-  background: var(--white);
+  background: var(--red);
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
@@ -262,7 +267,7 @@ button {
   line-height: 1.4;
   text-align: center;
   white-space: nowrap;
-  text-shadow: 0 3px 0 #8A1538, 0 12px 38px #8A1538;
+  text-shadow: 0 3px 0 #B00000, 0 12px 38px #B00000;
   transform: translate(-50%, -50%);
 }
 
@@ -382,10 +387,10 @@ p {
   font-weight: 400;
   line-height: 0.88;
   text-shadow:
-    0 3px 0 #8A1538,
+    0 3px 0 #B00000,
     0 0 2px rgba(255, 255, 255, 0.68),
-    0 0 18px rgba(153, 31, 61, 0.6),
-    0 10px 28px #8A1538;
+    0 0 18px rgba(176, 0, 0, 0.6),
+    0 10px 28px #B00000;
 }
 
 .lead {
@@ -422,7 +427,7 @@ p {
   font-family: var(--nav);
   font-weight: 700;
   text-shadow: var(--text-shadow-soft);
-  box-shadow: 0 14px 36px rgba(153, 31, 61, 0.25);
+  box-shadow: 0 14px 36px rgba(176, 0, 0, 0.25);
   transition: background 0.3s ease, transform 0.3s ease;
 }
 
@@ -494,7 +499,7 @@ p {
 
 .feature-card:hover {
   border-color: var(--red);
-  box-shadow: 0 0 34px rgba(153, 31, 61, 0.38);
+  box-shadow: 0 0 34px rgba(176, 0, 0, 0.38);
   transform: translateY(-5px);
 }
 
@@ -549,6 +554,10 @@ p {
   align-items: center;
 }
 
+.two-column > * {
+  min-width: 0;
+}
+
 .eyebrow {
   margin: 0 0 12px;
   color: var(--red);
@@ -557,7 +566,7 @@ p {
   font-weight: 400;
   line-height: 1;
   text-transform: none;
-  text-shadow: 0 2px 0 #8A1538, 0 0 14px #8A1538;
+  text-shadow: 0 2px 0 #B00000, 0 0 14px #B00000;
 }
 
 .section-image {
@@ -588,7 +597,10 @@ p {
   grid-template-columns: repeat(3, 1fr);
 }
 
-.gallery-counter {
+.gallery-counter,
+.event-counter,
+.food-menu-counter,
+.drink-menu-counter {
   display: none;
   margin-top: 16px;
   color: var(--muted);
@@ -624,7 +636,7 @@ p {
 .photo-grid figure::after {
   position: absolute;
   inset: 0;
-  background: rgba(153, 31, 61, 0.4);
+  background: rgba(176, 0, 0, 0.4);
   opacity: 0;
   transition: opacity 0.3s ease;
   content: "";
@@ -749,7 +761,9 @@ p {
 
 .map-frame,
 .calendar-frame {
+  display: block;
   width: 100%;
+  max-width: 100%;
   border: 1px solid var(--line);
   background: var(--panel);
 }
@@ -880,7 +894,7 @@ p {
 }
 
 .note {
-  color: #bdbdbd;
+  color: var(--white);
   font-size: 0.92rem;
 }
 
@@ -1004,9 +1018,10 @@ p {
   width: 42px;
   height: 42px;
   margin: 0;
+  border: 1px solid var(--red);
   border-radius: 50%;
-  color: var(--white);
-  background: var(--red);
+  color: var(--red);
+  background: rgba(0, 0, 0, 0.45);
 }
 
 .copyright {
@@ -1014,7 +1029,7 @@ p {
   margin: 42px auto 0;
   padding-top: 22px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-  color: #9a9a9a;
+  color: var(--white);
   text-align: center;
 }
 
@@ -1033,15 +1048,16 @@ p {
   place-items: center;
   width: 52px;
   height: 52px;
+  border: 1px solid var(--red);
   border-radius: 50%;
-  color: var(--white);
-  background: var(--red);
+  color: var(--red);
+  background: rgba(0, 0, 0, 0.45);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
   transition: background 0.3s ease, transform 0.3s ease;
 }
 
 .floating-social a:hover {
-  background: var(--deep-red);
+  background: rgba(176, 0, 0, 0.18);
   transform: translateX(-4px);
 }
 
@@ -1220,6 +1236,20 @@ p {
     flex-direction: column;
   }
 
+  .news-section .section-heading-row h2 {
+    font-size: clamp(1.45rem, 7vw, 1.85rem);
+    white-space: nowrap;
+  }
+
+  .contact-panel h2 {
+    font-size: clamp(1.6rem, 8vw, 2rem);
+    white-space: nowrap;
+  }
+
+  .access-section .map-frame {
+    height: 360px;
+  }
+
   .gallery-grid,
   .event-grid,
   .menu-image-grid,
@@ -1243,13 +1273,59 @@ p {
     display: none;
   }
 
-  .gallery-grid figure {
+  .event-grid {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    gap: 0;
+  }
+
+  .event-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .food-menu-board-grid,
+  .menu-image-grid {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    gap: 0;
+  }
+
+  .food-menu-board-grid::-webkit-scrollbar,
+  .menu-image-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .gallery-grid figure,
+  .event-grid figure,
+  .food-menu-board-grid figure,
+  .menu-image-grid figure {
     flex: 0 0 100%;
     scroll-snap-align: center;
     border: none;
   }
 
-  .gallery-counter {
+  .event-grid figure {
+    aspect-ratio: 500 / 400;
+  }
+
+  .event-grid img {
+    padding: 0;
+  }
+
+  .menu-image-grid img {
+    padding: 0;
+  }
+
+  .gallery-counter,
+  .event-counter,
+  .food-menu-counter,
+  .drink-menu-counter {
     display: block;
   }
 
@@ -1257,6 +1333,7 @@ p {
     display: flex;
     grid-auto-columns: unset;
     grid-auto-flow: unset;
+    align-items: flex-start;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
@@ -1271,12 +1348,14 @@ p {
 
   .news-card {
     flex: 0 0 100%;
+    aspect-ratio: 891 / 630;
     scroll-snap-align: center;
     border: none;
     border-radius: 0;
   }
 
   .news-card img {
+    height: 100%;
     aspect-ratio: auto;
     object-fit: contain;
   }

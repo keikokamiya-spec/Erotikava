@@ -117,39 +117,27 @@
     });
   });
 
-  // Gallery carousel counter
-  const galleryGrid = document.querySelector(".gallery-grid");
-  const galleryCounter = document.querySelector("[data-gallery-counter]");
-  if (galleryGrid && galleryCounter) {
-    const figures = Array.from(galleryGrid.querySelectorAll("figure"));
-    const total = figures.length;
+  function setupScrollCounter(scroller, counter, itemSelector) {
+    if (!scroller || !counter) return;
+    const items = Array.from(scroller.querySelectorAll(itemSelector));
+    const total = items.length;
+    if (!total) return;
 
     function updateCounter() {
-      const scrollLeft = galleryGrid.scrollLeft;
-      const cardWidth = galleryGrid.scrollWidth / total;
-      const current = Math.round(scrollLeft / cardWidth) + 1;
-      galleryCounter.textContent = current + " / " + total;
+      const cardWidth = scroller.scrollWidth / total;
+      const current = Math.min(total, Math.max(1, Math.round(scroller.scrollLeft / cardWidth) + 1));
+      counter.textContent = current + " / " + total;
     }
 
-    galleryGrid.addEventListener("scroll", updateCounter, { passive: true });
+    scroller.addEventListener("scroll", updateCounter, { passive: true });
     updateCounter();
   }
 
+  setupScrollCounter(document.querySelector(".gallery-grid"), document.querySelector("[data-gallery-counter]"), "figure");
+  setupScrollCounter(document.querySelector(".event-grid"), document.querySelector("[data-event-counter]"), "figure");
+  setupScrollCounter(document.querySelector(".food-menu-board-grid"), document.querySelector("[data-food-menu-counter]"), "figure");
+  setupScrollCounter(document.querySelector(".menu-image-grid"), document.querySelector("[data-drink-menu-counter]"), "figure");
+
   // News carousel counter
-  const newsSlider = document.querySelector(".news-slider");
-  const newsCounter = document.querySelector("[data-news-counter]");
-  if (newsSlider && newsCounter) {
-    const cards = Array.from(newsSlider.querySelectorAll(".news-card"));
-    const newsTotal = cards.length;
-
-    function updateNewsCounter() {
-      const scrollLeft = newsSlider.scrollLeft;
-      const cardWidth = newsSlider.scrollWidth / newsTotal;
-      const current = Math.round(scrollLeft / cardWidth) + 1;
-      newsCounter.textContent = current + " / " + newsTotal;
-    }
-
-    newsSlider.addEventListener("scroll", updateNewsCounter, { passive: true });
-    updateNewsCounter();
-  }
+  setupScrollCounter(document.querySelector(".news-slider"), document.querySelector("[data-news-counter]"), ".news-card");
 })();
