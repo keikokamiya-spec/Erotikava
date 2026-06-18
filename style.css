@@ -636,6 +636,10 @@ p {
   box-shadow: var(--shadow);
 }
 
+.calendar-start-wed {
+  grid-column: 3;
+}
+
 .calendar-event-head {
   display: flex;
   align-items: center;
@@ -667,7 +671,7 @@ p {
 
 .calendar-event-card figure {
   margin: 0;
-  aspect-ratio: 5 / 7;
+  aspect-ratio: 891 / 630;
   background: #050505;
 }
 
@@ -678,19 +682,19 @@ p {
   background: #050505;
 }
 
-.calendar-event-card.is-closed {
+.calendar-event-card.is-pending {
   min-height: 240px;
   background:
     linear-gradient(rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0.78)),
     url("images/background.jpg") center / cover no-repeat;
 }
 
-.calendar-event-card.is-closed .calendar-event-label {
+.calendar-event-card.is-pending .calendar-event-label {
   color: var(--white);
   border-color: rgba(255, 255, 255, 0.18);
 }
 
-.calendar-closed-note {
+.calendar-pending-note {
   display: grid;
   place-items: center;
   padding: 28px 18px;
@@ -699,13 +703,6 @@ p {
   font-size: 1.4rem;
   font-weight: 700;
   text-align: center;
-}
-
-.calendar-event-card.is-empty {
-  min-height: 0;
-  border-style: dashed;
-  background: rgba(255, 255, 255, 0.02);
-  box-shadow: none;
 }
 
 .gallery-counter,
@@ -1431,6 +1428,10 @@ p {
     gap: 16px;
   }
 
+  .calendar-start-wed {
+    grid-column: auto;
+  }
+
   .gallery-grid {
     display: flex;
     overflow-x: auto;
@@ -1490,12 +1491,12 @@ p {
   }
 
   .calendar-event-card,
-  .calendar-event-card.is-closed {
+  .calendar-event-card.is-pending {
     min-height: 0;
   }
 
   .calendar-event-card figure {
-    aspect-ratio: 500 / 400;
+    aspect-ratio: 891 / 630;
   }
 
   .profile-grid figure {
