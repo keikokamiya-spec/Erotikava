@@ -21,6 +21,7 @@
     <nav class="site-nav" data-nav>
       <a href="index.html">トップ</a>
       <a href="reservations.html">イベント・日程</a>
+      <a href="profile.html">プロフィール</a>
       <a href="menu.html">メニュー・料金</a>
     </nav>
   </header>
@@ -49,17 +50,54 @@
       <div class="section-inner">
         <p class="eyebrow center">Monthly Event</p>
         <h2 class="section-title">今月のイベント</h2>
-        <div class="photo-grid event-grid">
-          <figure><img src="images/event1.jpg" alt="今月のイベント1" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure>
-          <figure><img src="images/event2.jpg" alt="今月のイベント2" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure>
-          <figure><img src="images/event3.jpg" alt="今月のイベント3" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure>
-          <figure><img src="images/event4.jpg" alt="今月のイベント4" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure>
-          <figure><img src="images/event5.jpg" alt="今月のイベント5" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure>
-          <figure><img src="images/event6.jpg" alt="今月のイベント6" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure>
-          <figure><img src="images/event7.jpg" alt="今月のイベント7" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure>
-          <figure><img src="images/event8.jpg" alt="今月のイベント8" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure>
+        <div class="monthly-event-calendar">
+          <div class="calendar-weekdays" aria-hidden="true">
+            <span>月</span>
+            <span>火</span>
+            <span>水</span>
+            <span>木</span>
+            <span>金</span>
+            <span>土</span>
+            <span>日</span>
+          </div>
+          <div class="calendar-event-grid">
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/1</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event1.jpg" alt="6月1日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/2</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event2.jpg" alt="6月2日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/3</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event3.jpg" alt="6月3日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/4</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event4.jpg" alt="6月4日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/5</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event5.jpg" alt="6月5日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/6</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event6.jpg" alt="6月6日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <article class="calendar-event-card is-closed"><div class="calendar-event-head"><span class="calendar-event-date">6/7</span><span class="calendar-event-label">Close</span></div><div class="calendar-closed-note">日曜定休</div></article>
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/8</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event7.jpg" alt="6月8日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/9</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event8.jpg" alt="6月9日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/10</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event1.jpg" alt="6月10日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/11</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event2.jpg" alt="6月11日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/12</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event3.jpg" alt="6月12日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/13</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event4.jpg" alt="6月13日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <article class="calendar-event-card is-closed"><div class="calendar-event-head"><span class="calendar-event-date">6/14</span><span class="calendar-event-label">Close</span></div><div class="calendar-closed-note">日曜定休</div></article>
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/15</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event5.jpg" alt="6月15日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/16</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event6.jpg" alt="6月16日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/17</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event7.jpg" alt="6月17日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/18</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event8.jpg" alt="6月18日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/19</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event1.jpg" alt="6月19日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/20</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event2.jpg" alt="6月20日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <article class="calendar-event-card is-closed"><div class="calendar-event-head"><span class="calendar-event-date">6/21</span><span class="calendar-event-label">Close</span></div><div class="calendar-closed-note">日曜定休</div></article>
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/22</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event3.jpg" alt="6月22日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/23</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event4.jpg" alt="6月23日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/24</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event5.jpg" alt="6月24日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/25</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event6.jpg" alt="6月25日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/26</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event7.jpg" alt="6月26日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/27</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event8.jpg" alt="6月27日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <article class="calendar-event-card is-closed"><div class="calendar-event-head"><span class="calendar-event-date">6/28</span><span class="calendar-event-label">Close</span></div><div class="calendar-closed-note">日曜定休</div></article>
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/29</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event1.jpg" alt="6月29日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <article class="calendar-event-card"><div class="calendar-event-head"><span class="calendar-event-date">6/30</span><span class="calendar-event-label">Show</span></div><figure><img src="images/event2.jpg" alt="6月30日のイベント" onerror="this.src='https://placehold.co/500x400/1A1A1A/ffffff?text=Event'"></figure></article>
+            <div class="calendar-event-card is-empty" aria-hidden="true"></div>
+            <div class="calendar-event-card is-empty" aria-hidden="true"></div>
+            <div class="calendar-event-card is-empty" aria-hidden="true"></div>
+            <div class="calendar-event-card is-empty" aria-hidden="true"></div>
+            <div class="calendar-event-card is-empty" aria-hidden="true"></div>
+          </div>
         </div>
-        <div class="event-counter" data-event-counter>1 / 8</div>
       </div>
     </section>
 
@@ -88,6 +126,7 @@
         <h2>サイトリンク</h2>
         <a href="index.html">トップ</a>
         <a href="reservations.html">イベント・日程</a>
+        <a href="profile.html">プロフィール</a>
         <a href="menu.html">メニュー・料金</a>
       </div>
       <div>

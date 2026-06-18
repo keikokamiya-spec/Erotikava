@@ -597,6 +597,117 @@ p {
   grid-template-columns: repeat(3, 1fr);
 }
 
+.store-gallery-grid {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.monthly-event-calendar {
+  display: grid;
+  gap: 14px;
+}
+
+.calendar-weekdays,
+.calendar-event-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.calendar-weekdays span {
+  display: grid;
+  place-items: center;
+  min-height: 52px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--red);
+  background: rgba(12, 12, 12, 0.9);
+  font-family: var(--nav);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.calendar-event-card {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: linear-gradient(180deg, #120808, #090909);
+  box-shadow: var(--shadow);
+}
+
+.calendar-event-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(176, 0, 0, 0.12);
+}
+
+.calendar-event-date {
+  color: var(--white);
+  font-family: var(--display);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.calendar-event-label {
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--red);
+  font-family: var(--nav);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.calendar-event-card figure {
+  margin: 0;
+  aspect-ratio: 5 / 7;
+  background: #050505;
+}
+
+.calendar-event-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #050505;
+}
+
+.calendar-event-card.is-closed {
+  min-height: 240px;
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0.78)),
+    url("images/background.jpg") center / cover no-repeat;
+}
+
+.calendar-event-card.is-closed .calendar-event-label {
+  color: var(--white);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.calendar-closed-note {
+  display: grid;
+  place-items: center;
+  padding: 28px 18px;
+  color: var(--white);
+  font-family: var(--display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.calendar-event-card.is-empty {
+  min-height: 0;
+  border-style: dashed;
+  background: rgba(255, 255, 255, 0.02);
+  box-shadow: none;
+}
+
 .gallery-counter,
 .event-counter,
 .food-menu-counter,
@@ -615,6 +726,29 @@ p {
   grid-template-columns: repeat(4, 1fr);
 }
 
+.profile-grid {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.profile-category + .profile-category {
+  margin-top: 72px;
+}
+
+.profile-category-title {
+  margin: 0 0 28px;
+  color: var(--red);
+  font-size: clamp(1.8rem, 3.4vw, 2.6rem);
+  text-align: center;
+}
+
+.profile-grid figure {
+  aspect-ratio: 630 / 891;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #050505;
+  box-shadow: var(--shadow);
+}
+
 .event-grid figure {
   background: #050505;
 }
@@ -630,6 +764,11 @@ p {
 
 .menu-image-grid figure {
   aspect-ratio: 5 / 7;
+  background: #050505;
+}
+
+.store-gallery-grid figure {
+  aspect-ratio: 1108 / 1477;
   background: #050505;
 }
 
@@ -654,9 +793,27 @@ p {
   padding: 10px;
 }
 
+.store-gallery-grid img {
+  object-fit: contain;
+  background: #050505;
+}
+
 .event-grid img {
   object-fit: contain;
   padding: 4px;
+}
+
+.profile-grid img {
+  object-fit: contain;
+  padding: 0;
+}
+
+.profile-grid figure::after {
+  display: none;
+}
+
+.profile-grid figure:hover img {
+  transform: none;
 }
 
 .photo-grid figure:hover img {
@@ -1173,6 +1330,11 @@ p {
   .menu-image-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .store-gallery-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
 }
 
 @media (max-width: 640px) {
@@ -1260,6 +1422,15 @@ p {
     grid-template-columns: 1fr;
   }
 
+  .calendar-weekdays {
+    display: none;
+  }
+
+  .calendar-event-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
   .gallery-grid {
     display: flex;
     overflow-x: auto;
@@ -1312,6 +1483,23 @@ p {
 
   .event-grid figure {
     aspect-ratio: 500 / 400;
+  }
+
+  .store-gallery-grid figure {
+    aspect-ratio: 1108 / 1477;
+  }
+
+  .calendar-event-card,
+  .calendar-event-card.is-closed {
+    min-height: 0;
+  }
+
+  .calendar-event-card figure {
+    aspect-ratio: 500 / 400;
+  }
+
+  .profile-grid figure {
+    aspect-ratio: 891 / 630;
   }
 
   .event-grid img {
