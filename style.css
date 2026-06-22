@@ -523,18 +523,20 @@ p {
 }
 
 .feature-card-media-only {
-  display: block;
+  display: flex;
   padding: 0;
   overflow: hidden;
 }
 
 .feature-card-media-only .feature-card-image {
+  display: block;
+  flex: 1 1 auto;
   width: 100%;
   height: 100%;
   aspect-ratio: auto;
   margin-bottom: 0;
   border-radius: 8px;
-  object-fit: contain;
+  object-fit: fill;
   background: #1a1a1a;
   padding: 0;
 }
@@ -575,6 +577,14 @@ p {
   border: 1px solid var(--line);
   object-fit: cover;
   box-shadow: var(--shadow);
+}
+
+.section-image-cocktail {
+  aspect-ratio: auto;
+  height: auto;
+  object-fit: contain;
+  object-position: center top;
+  background: #050505;
 }
 
 .section-image-contain {
@@ -1303,15 +1313,15 @@ p {
   }
 
   .feature-card-media-only {
-    display: block;
-    height: auto;
+    display: flex;
+    height: 100%;
     padding: 0;
   }
 
   .feature-card-media-only .feature-card-image {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: fill;
   }
 
   .two-column {
@@ -1546,7 +1556,7 @@ p {
   .news-card img {
     height: 100%;
     aspect-ratio: auto;
-    object-fit: contain;
+    object-fit: fill;
   }
 
   .news-counter {
