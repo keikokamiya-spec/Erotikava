@@ -61,8 +61,8 @@
       <div class="section-inner narrow center">
         <h1>Erotikava</h1>
         <p class="lead">千葉初のショースタイルBAR</p>
-        <p class="hours-badge">Open 18:00〜 / 月〜木・2:30 last / 金・土・5:30 last / 日曜定休</p>
-        <a class="primary-button" href="reservations.html">イベント・日程を見る</a>
+        <input class="hours-badge hours-badge-input" type="text" value="Open 18:00〜 / 月〜木・2:30 last / 金・土・5:30 last / 日曜定休" aria-label="営業時間">
+        <a class="primary-button" href="reservations.html#event-calendar">イベント・日程を見る</a>
       </div>
     </section>
 
@@ -120,10 +120,6 @@
             <p class="eyebrow">News</p>
             <h2>今月のコラボ企画&ニュース</h2>
           </div>
-          <div class="scroll-controls">
-            <button type="button" data-scroll-prev aria-label="前へ">‹</button>
-            <button type="button" data-scroll-next aria-label="次へ">›</button>
-          </div>
         </div>
         <div class="news-slider" data-card-slider>
           <article class="news-card">
@@ -142,7 +138,11 @@
             <img src="images/line_oa_chat_260618_193442.jpg" alt="イベント・ニュース" onerror="this.src='https://placehold.co/600x400/1A1A1A/ffffff?text=News'">
           </article>
         </div>
-        <div class="news-counter" data-news-counter>1 / 5</div>
+        <div class="news-controls-row">
+          <button type="button" class="news-control-button" data-scroll-prev aria-label="前へ">‹</button>
+          <div class="news-counter" data-news-counter>1 / 5</div>
+          <button type="button" class="news-control-button" data-scroll-next aria-label="次へ">›</button>
+        </div>
       </div>
     </section>
 

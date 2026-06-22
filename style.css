@@ -413,6 +413,19 @@ p {
   font-weight: 700;
 }
 
+.hours-badge-input {
+  width: min(100%, 1000px);
+  outline: none;
+  box-shadow: none;
+  text-align: center;
+  appearance: none;
+}
+
+.hours-badge-input:focus {
+  border-color: var(--red);
+  box-shadow: 0 0 0 2px rgba(176, 0, 0, 0.28);
+}
+
 .primary-button {
   display: inline-flex;
   align-items: center;
@@ -616,11 +629,58 @@ p {
   gap: 14px;
 }
 
+.event-search-panel {
+  width: min(720px, 100%);
+  margin: 0 auto 24px;
+}
+
+.event-search-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--red);
+  font-family: var(--nav);
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.event-search-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--white);
+  background: rgba(10, 10, 10, 0.92);
+  box-shadow: var(--shadow);
+  font: inherit;
+  font-family: var(--nav);
+}
+
+.event-search-input:focus {
+  outline: 2px solid rgba(176, 0, 0, 0.55);
+  outline-offset: 2px;
+  border-color: var(--red);
+}
+
+.event-search-input::-webkit-search-cancel-button {
+  cursor: pointer;
+}
+
+.event-search-status {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
 .calendar-weekdays,
 .calendar-event-grid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 14px;
+}
+
+.calendar-event-grid {
+  align-items: start;
 }
 
 .calendar-weekdays span {
@@ -644,6 +704,15 @@ p {
   border-radius: 10px;
   background: linear-gradient(180deg, #120808, #090909);
   box-shadow: var(--shadow);
+}
+
+.calendar-event-card[data-event-status="scheduled"] {
+  display: block;
+  background: #050505;
+}
+
+.calendar-event-card[data-event-status="scheduled"] .calendar-event-head {
+  display: none;
 }
 
 .calendar-start-wed {
@@ -713,6 +782,55 @@ p {
   font-size: 1.4rem;
   font-weight: 700;
   text-align: center;
+}
+
+@media (min-width: 961px) {
+  #event-calendar > .section-inner {
+    width: min(1880px, calc(100% - 12px));
+  }
+
+  .monthly-event-calendar {
+    overflow: visible;
+    padding-bottom: 0;
+  }
+
+  .event-search-panel {
+    width: min(960px, 100%);
+  }
+
+  .calendar-weekdays {
+    display: grid;
+  }
+
+  .calendar-weekdays span {
+    min-height: 46px;
+  }
+
+  .calendar-weekdays,
+  .calendar-event-grid {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .calendar-start-wed {
+    grid-column: 3;
+  }
+
+  .calendar-event-card.is-pending {
+    min-height: 0;
+    aspect-ratio: 891 / 630;
+    grid-template-rows: 1fr;
+  }
+
+  .calendar-event-card.is-pending .calendar-event-head {
+    display: none;
+  }
+
+  .calendar-pending-note {
+    height: 100%;
+    padding: 18px;
+    font-size: clamp(1.15rem, 1.45vw, 1.55rem);
+  }
 }
 
 .gallery-counter,
@@ -868,7 +986,12 @@ p {
   overflow-x: auto;
   padding-bottom: 12px;
   scroll-snap-type: x mandatory;
-  scrollbar-color: var(--red) #171717;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.news-slider::-webkit-scrollbar {
+  display: none;
 }
 
 .news-card {
@@ -886,9 +1009,17 @@ p {
   background: #000000;
 }
 
-.news-counter {
-  display: none;
+.news-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
   margin-top: 16px;
+}
+
+.news-counter {
+  display: block;
+  min-width: 84px;
   color: var(--muted);
   font-family: var(--nav);
   font-size: 0.95rem;
@@ -897,8 +1028,33 @@ p {
   letter-spacing: 0.1em;
 }
 
+.news-control-button {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--white);
+  background: rgba(0, 0, 0, 0.42);
+  font-family: var(--nav);
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.news-control-button:hover {
+  background: rgba(176, 0, 0, 0.25);
+  transform: translateY(-2px);
+}
+
 .contact-panel {
   padding: 34px;
+}
+
+.contact-panel h2 {
+  font-size: clamp(1.7rem, 2.6vw, 2.5rem);
+  white-space: nowrap;
 }
 
 .info-list {
@@ -963,6 +1119,12 @@ p {
   margin: 18px auto 0;
   background: var(--red);
   content: "";
+}
+
+.event-page-hero::after {
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.72)),
+    radial-gradient(circle at center, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.42));
 }
 
 .notice-lines {
@@ -1411,7 +1573,7 @@ p {
   }
 
   .contact-panel h2 {
-    font-size: clamp(1.6rem, 8vw, 2rem);
+    font-size: clamp(1.25rem, 5.8vw, 1.7rem);
     white-space: nowrap;
   }
 
@@ -1560,11 +1722,7 @@ p {
   }
 
   .news-counter {
-    display: block;
-  }
-
-  .scroll-controls {
-    display: none;
+    text-align: center;
   }
 
   .info-list div {

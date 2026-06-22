@@ -133,6 +133,39 @@
     updateCounter();
   }
 
+  const eventSearchInput = document.querySelector("[data-event-search-input]");
+  const eventSearchStatus = document.querySelector("[data-event-search-status]");
+  const eventCards = Array.from(document.querySelectorAll(".calendar-event-card"));
+  if (eventSearchInput && eventSearchStatus && eventCards.length) {
+    const total = eventCards.length;
+
+    const normalize = (value) => value.toLowerCase().replace(/\s+/g, "");
+
+    const updateSearch = () => {
+      const query = normalize(eventSearchInput.value);
+      let visible = 0;
+
+      eventCards.forEach((card) => {
+        const haystack = normalize([
+          card.dataset.eventDate || "",
+          card.dataset.eventStatus || "",
+          card.textContent || "",
+        ].join(" "));
+        const matches = !query || haystack.includes(query);
+        card.hidden = !matches;
+        if (matches) visible += 1;
+      });
+
+      eventSearchStatus.textContent = query
+        ? `${visible}件ヒット / 全${total}件`
+        : `${total}件表示中`;
+    };
+
+    eventSearchInput.addEventListener("input", updateSearch);
+    eventSearchInput.addEventListener("search", updateSearch);
+    updateSearch();
+  }
+
   setupScrollCounter(document.querySelector(".gallery-grid"), document.querySelector("[data-gallery-counter]"), "figure");
   setupScrollCounter(document.querySelector(".event-grid"), document.querySelector("[data-event-counter]"), "figure");
   setupScrollCounter(document.querySelector(".food-menu-board-grid"), document.querySelector("[data-food-menu-counter]"), "figure");
