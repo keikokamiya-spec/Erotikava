@@ -170,6 +170,9 @@
   setupScrollCounter(document.querySelector(".event-grid"), document.querySelector("[data-event-counter]"), "figure");
   setupScrollCounter(document.querySelector(".food-menu-board-grid"), document.querySelector("[data-food-menu-counter]"), "figure");
   setupScrollCounter(document.querySelector(".menu-image-grid"), document.querySelector("[data-drink-menu-counter]"), "figure");
+  document.querySelectorAll(".profile-category").forEach((category) => {
+    setupScrollCounter(category.querySelector(".profile-grid"), category.querySelector("[data-profile-counter]"), "figure");
+  });
 
   // News carousel counter
   setupScrollCounter(document.querySelector(".news-slider"), document.querySelector("[data-news-counter]"), ".news-card");

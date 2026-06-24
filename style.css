@@ -610,6 +610,10 @@ p {
   text-align: center;
 }
 
+.mobile-break {
+  display: none;
+}
+
 .photo-grid {
   display: grid;
   gap: 18px;
@@ -1079,6 +1083,12 @@ p {
   color: var(--muted);
 }
 
+.hours-note {
+  display: inline-block;
+  margin-top: 10px;
+  line-height: 1.7;
+}
+
 .map-frame,
 .calendar-frame {
   display: block;
@@ -1186,6 +1196,29 @@ p {
 
 .price-card {
   padding: 28px;
+}
+
+.plan-image-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.plan-image-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.single-plan-image-card {
+  width: min(100%, 578px);
+  margin: 0 auto;
+}
+
+.single-plan-image-card img {
+  aspect-ratio: 1200 / 920;
+  height: 100%;
+  object-fit: contain;
+  background: #050505;
 }
 
 .price {
@@ -1324,6 +1357,20 @@ p {
 
 .site-footer a:hover {
   color: var(--white);
+}
+
+.inline-link,
+.site-footer .inline-link {
+  display: inline;
+  margin: 0;
+  color: var(--white);
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+.inline-link:hover,
+.site-footer .inline-link:hover {
+  color: var(--red);
 }
 
 .site-footer .footer-brand-link {
@@ -1575,6 +1622,10 @@ p {
   .contact-panel h2 {
     font-size: clamp(1.25rem, 5.8vw, 1.7rem);
     white-space: nowrap;
+  }
+
+  .mobile-break {
+    display: inline;
   }
 
   .access-section .map-frame {
