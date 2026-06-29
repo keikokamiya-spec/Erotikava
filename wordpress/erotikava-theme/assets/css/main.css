@@ -48,7 +48,7 @@ body::after {
 }
 
 body::before {
-  background: url("images/background.jpg") center / cover no-repeat fixed;
+  background: var(--erotikava-body-bg) center / cover no-repeat fixed;
 }
 
 body::after {
@@ -60,6 +60,10 @@ body::after {
 
 body.menu-open {
   overflow: hidden;
+}
+
+body.admin-bar .site-header {
+  top: 32px;
 }
 
 img {
@@ -253,6 +257,12 @@ button {
   object-fit: cover;
 }
 
+.hero-slide-link {
+  display: block;
+  height: 100%;
+  color: inherit;
+}
+
 .hero-caption {
   position: absolute;
   top: 50%;
@@ -335,7 +345,7 @@ button {
 .intro-section {
   background:
     linear-gradient(rgba(0, 0, 0, 0.68), rgba(0, 0, 0, 0.72)),
-    url("img/setb/j.jpg") center / cover no-repeat;
+    var(--erotikava-intro-bg) center / cover no-repeat;
 }
 
 .section-inner {
@@ -483,28 +493,19 @@ p {
   transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
-.feature-card-bg-show {
+.feature-card-bg-show,
+.feature-card-bg-vip,
+.feature-card-has-bg {
   position: relative;
   overflow: hidden;
   background:
     linear-gradient(rgba(0, 0, 0, 0.52), rgba(0, 0, 0, 0.76)),
-    url("img/setc/b.jpg") center / cover no-repeat;
+    var(--erotikava-bg-image, var(--erotikava-feature-default-bg)) center / cover no-repeat;
 }
 
-.feature-card-bg-show > * {
-  position: relative;
-  z-index: 1;
-}
-
-.feature-card-bg-vip {
-  position: relative;
-  overflow: hidden;
-  background:
-    linear-gradient(rgba(0, 0, 0, 0.56), rgba(0, 0, 0, 0.78)),
-    url("img/setb/j.jpg") center / cover no-repeat;
-}
-
-.feature-card-bg-vip > * {
+.feature-card-bg-show > *,
+.feature-card-bg-vip > *,
+.feature-card-has-bg > * {
   position: relative;
   z-index: 1;
 }
@@ -551,6 +552,10 @@ p {
   object-fit: fill;
   background: #1a1a1a;
   padding: 0;
+}
+
+.news-card-link {
+  display: block;
 }
 
 .feature-icon svg,
@@ -768,7 +773,7 @@ p {
   min-height: 240px;
   background:
     linear-gradient(rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0.78)),
-    url("images/background.jpg") center / cover no-repeat;
+    var(--erotikava-body-bg) center / cover no-repeat;
 }
 
 .calendar-event-card.is-pending .calendar-event-label {
@@ -1510,7 +1515,8 @@ p {
 
   .feature-card,
   .feature-card-bg-show,
-  .feature-card-bg-vip {
+  .feature-card-bg-vip,
+  .feature-card-has-bg {
     min-height: 0;
     aspect-ratio: 891 / 630;
   }
@@ -1554,6 +1560,10 @@ p {
 }
 
 @media (max-width: 640px) {
+  body.admin-bar .site-header {
+    top: 46px;
+  }
+
   .site-header {
     min-height: 72px;
     padding: 12px 16px;
