@@ -9,12 +9,34 @@ $post_id = get_queried_object_id();
 $hero = erotikava_get_page_hero_data('profile', $post_id);
 $defaults = erotikava_get_page_defaults('profile');
 $use_defaults = erotikava_use_seed_defaults();
+$limits = erotikava_get_content_limits();
 $profile_intro_eyebrow = (string) erotikava_get_field_value('profile_intro_eyebrow', $use_defaults ? ($defaults['intro_eyebrow'] ?? '') : '', $post_id);
 $profile_intro_title = (string) erotikava_get_field_value('profile_intro_title', $use_defaults ? ($defaults['intro_title'] ?? '') : '', $post_id);
-$profile_intro_paragraphs = erotikava_get_repeater_value('profile_intro_paragraphs', $use_defaults ? ($defaults['intro_paragraphs'] ?? []) : [], $post_id);
+$profile_intro_paragraphs = $use_defaults
+    ? ($defaults['intro_paragraphs'] ?? [])
+    : erotikava_collect_fixed_items((int) ($limits['profile_intro_paragraphs'] ?? 0), function (int $index) use ($post_id): array {
+        return [
+            'text' => (string) erotikava_get_field_value("profile_intro_paragraph_{$index}", '', $post_id),
+        ];
+    });
 $profile_section_eyebrow = (string) erotikava_get_field_value('profile_section_eyebrow', $use_defaults ? ($defaults['section_eyebrow'] ?? '') : '', $post_id);
 $profile_section_title = (string) erotikava_get_field_value('profile_section_title', $use_defaults ? ($defaults['section_title'] ?? '') : '', $post_id);
-$profile_categories = erotikava_get_repeater_value('profile_categories', $use_defaults ? ($defaults['categories'] ?? []) : [], $post_id);
+$profile_categories = $use_defaults
+    ? ($defaults['categories'] ?? [])
+    : erotikava_collect_fixed_items((int) ($limits['profile_categories'] ?? 0), function (int $index) use ($limits, $post_id): array {
+        $images = erotikava_collect_fixed_items((int) ($limits['profile_category_images'] ?? 0), function (int $image_index) use ($index, $post_id): array {
+            return [
+                'image' => (int) erotikava_get_field_value("profile_category_{$index}_image_{$image_index}", 0, $post_id),
+                'image_alt' => (string) erotikava_get_field_value("profile_category_{$index}_image_{$image_index}_alt", '', $post_id),
+            ];
+        });
+
+        return [
+            'category_eyebrow' => (string) erotikava_get_field_value("profile_category_{$index}_eyebrow", '', $post_id),
+            'category_title' => (string) erotikava_get_field_value("profile_category_{$index}_title", '', $post_id),
+            'category_images' => $images,
+        ];
+    });
 $store = erotikava_get_store_data();
 
 get_header();
@@ -114,4 +136,3 @@ get_header();
 </main>
 <?php
 get_footer();
-

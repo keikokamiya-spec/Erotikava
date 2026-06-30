@@ -41,11 +41,68 @@ if (! function_exists('erotikava_acf_image')) {
     }
 }
 
+if (! function_exists('erotikava_acf_link')) {
+    function erotikava_acf_link(string $key, string $label, string $name, array $extra = []): array
+    {
+        return array_merge([
+            'key' => $key,
+            'label' => $label,
+            'name' => $name,
+            'type' => 'link',
+            'return_format' => 'array',
+        ], $extra);
+    }
+}
+
+if (! function_exists('erotikava_acf_true_false')) {
+    function erotikava_acf_true_false(string $key, string $label, string $name, array $extra = []): array
+    {
+        return array_merge([
+            'key' => $key,
+            'label' => $label,
+            'name' => $name,
+            'type' => 'true_false',
+            'ui' => 1,
+        ], $extra);
+    }
+}
+
+if (! function_exists('erotikava_acf_select')) {
+    function erotikava_acf_select(string $key, string $label, string $name, array $choices, array $extra = []): array
+    {
+        return array_merge([
+            'key' => $key,
+            'label' => $label,
+            'name' => $name,
+            'type' => 'select',
+            'choices' => $choices,
+            'return_format' => 'value',
+            'ui' => 1,
+        ], $extra);
+    }
+}
+
+if (! function_exists('erotikava_acf_message')) {
+    function erotikava_acf_message(string $key, string $label, string $message = ''): array
+    {
+        return [
+            'key' => $key,
+            'label' => $label,
+            'name' => '',
+            'type' => 'message',
+            'message' => $message !== '' ? $message : '<strong>' . esc_html($label) . '</strong>',
+            'new_lines' => 'wpautop',
+            'esc_html' => 0,
+        ];
+    }
+}
+
 add_action('acf/init', function (): void {
     if (! function_exists('acf_add_local_field_group')) {
         return;
     }
 
+    $limits = erotikava_get_content_limits();
     $page_template_locations = [
         [
             ['param' => 'page_template', 'operator' => '==', 'value' => 'page-reservations.php'],
@@ -76,136 +133,155 @@ add_action('acf/init', function (): void {
         'active' => true,
     ]);
 
+    $front_page_fields = [
+        erotikava_acf_tab('field_erotikava_home_tab_hero', 'メインビジュアル'),
+    ];
+
+    for ($slide_index = 1; $slide_index <= (int) ($limits['home_hero_slides'] ?? 0); $slide_index++) {
+        $front_page_fields[] = erotikava_acf_message(
+            "field_erotikava_home_hero_slide_{$slide_index}_heading",
+            "スライド {$slide_index}"
+        );
+        $front_page_fields[] = erotikava_acf_image(
+            "field_erotikava_home_hero_slide_{$slide_index}_image",
+            '画像',
+            "home_hero_slide_{$slide_index}_image"
+        );
+        $front_page_fields[] = erotikava_acf_image(
+            "field_erotikava_home_hero_slide_{$slide_index}_mobile_image",
+            'モバイル画像',
+            "home_hero_slide_{$slide_index}_mobile_image"
+        );
+        $front_page_fields[] = erotikava_acf_text(
+            "field_erotikava_home_hero_slide_{$slide_index}_image_alt",
+            '画像alt',
+            "home_hero_slide_{$slide_index}_image_alt"
+        );
+
+        for ($line_index = 1; $line_index <= (int) ($limits['home_hero_caption_lines'] ?? 0); $line_index++) {
+            $front_page_fields[] = erotikava_acf_text(
+                "field_erotikava_home_hero_slide_{$slide_index}_caption_{$line_index}",
+                "キャプション {$line_index}",
+                "home_hero_slide_{$slide_index}_caption_{$line_index}"
+            );
+        }
+
+        $front_page_fields[] = erotikava_acf_link(
+            "field_erotikava_home_hero_slide_{$slide_index}_link",
+            'リンク',
+            "home_hero_slide_{$slide_index}_link"
+        );
+    }
+
+    $front_page_fields[] = erotikava_acf_tab('field_erotikava_home_tab_intro', 'イントロ');
+    $front_page_fields[] = erotikava_acf_text('field_erotikava_home_intro_title', 'タイトル', 'home_intro_title');
+    $front_page_fields[] = erotikava_acf_text('field_erotikava_home_intro_lead', 'リード', 'home_intro_lead');
+    $front_page_fields[] = erotikava_acf_text('field_erotikava_home_intro_hours_badge', '営業時間バッジ', 'home_intro_hours_badge');
+    $front_page_fields[] = erotikava_acf_text('field_erotikava_home_intro_cta_text', 'CTAテキスト', 'home_intro_cta_text');
+    $front_page_fields[] = erotikava_acf_link('field_erotikava_home_intro_cta_link', 'CTAリンク', 'home_intro_cta_link');
+
+    $front_page_fields[] = erotikava_acf_tab('field_erotikava_home_tab_features', '特徴カード');
+    for ($feature_index = 1; $feature_index <= (int) ($limits['home_features'] ?? 0); $feature_index++) {
+        $front_page_fields[] = erotikava_acf_message(
+            "field_erotikava_home_feature_{$feature_index}_heading",
+            "特徴カード {$feature_index}"
+        );
+        $front_page_fields[] = erotikava_acf_select(
+            "field_erotikava_home_feature_{$feature_index}_card_type",
+            'カード種別',
+            "home_feature_{$feature_index}_card_type",
+            [
+                'text_background' => 'text_background',
+                'image_only' => 'image_only',
+            ]
+        );
+        $front_page_fields[] = erotikava_acf_image(
+            "field_erotikava_home_feature_{$feature_index}_image",
+            '画像',
+            "home_feature_{$feature_index}_image"
+        );
+        $front_page_fields[] = erotikava_acf_text(
+            "field_erotikava_home_feature_{$feature_index}_image_alt",
+            '画像alt',
+            "home_feature_{$feature_index}_image_alt"
+        );
+        $front_page_fields[] = erotikava_acf_text(
+            "field_erotikava_home_feature_{$feature_index}_title",
+            'タイトル',
+            "home_feature_{$feature_index}_title"
+        );
+        $front_page_fields[] = erotikava_acf_text(
+            "field_erotikava_home_feature_{$feature_index}_description",
+            '説明',
+            "home_feature_{$feature_index}_description",
+            'textarea',
+            ['rows' => 3]
+        );
+    }
+
+    $front_page_fields[] = erotikava_acf_tab('field_erotikava_home_tab_concept', 'コンセプト');
+    $front_page_fields[] = erotikava_acf_text('field_erotikava_home_concept_eyebrow', 'アイブロウ', 'home_concept_eyebrow');
+    $front_page_fields[] = erotikava_acf_text('field_erotikava_home_concept_title', 'タイトル', 'home_concept_title');
+    $front_page_fields[] = erotikava_acf_text('field_erotikava_home_concept_text', '本文', 'home_concept_text', 'wysiwyg');
+    $front_page_fields[] = erotikava_acf_image('field_erotikava_home_concept_image', '画像', 'home_concept_image');
+    $front_page_fields[] = erotikava_acf_text('field_erotikava_home_concept_image_alt', '画像alt', 'home_concept_image_alt');
+
+    $front_page_fields[] = erotikava_acf_tab('field_erotikava_home_tab_gallery', '店内ギャラリー');
+    $front_page_fields[] = erotikava_acf_text('field_erotikava_home_gallery_eyebrow', 'アイブロウ', 'home_gallery_eyebrow');
+    $front_page_fields[] = erotikava_acf_text('field_erotikava_home_gallery_title', 'タイトル', 'home_gallery_title');
+    for ($image_index = 1; $image_index <= (int) ($limits['home_gallery_images'] ?? 0); $image_index++) {
+        $front_page_fields[] = erotikava_acf_image(
+            "field_erotikava_home_gallery_image_{$image_index}",
+            "画像 {$image_index}",
+            "home_gallery_image_{$image_index}"
+        );
+        $front_page_fields[] = erotikava_acf_text(
+            "field_erotikava_home_gallery_image_{$image_index}_alt",
+            "画像 {$image_index} alt",
+            "home_gallery_image_{$image_index}_alt"
+        );
+    }
+
+    $front_page_fields[] = erotikava_acf_tab('field_erotikava_home_tab_news', 'ニュース');
+    $front_page_fields[] = erotikava_acf_text('field_erotikava_home_news_eyebrow', 'アイブロウ', 'home_news_eyebrow');
+    $front_page_fields[] = erotikava_acf_text('field_erotikava_home_news_title', 'タイトル', 'home_news_title');
+    for ($news_index = 1; $news_index <= (int) ($limits['home_news_items'] ?? 0); $news_index++) {
+        $front_page_fields[] = erotikava_acf_message(
+            "field_erotikava_home_news_item_{$news_index}_heading",
+            "ニュース {$news_index}"
+        );
+        $front_page_fields[] = erotikava_acf_image(
+            "field_erotikava_home_news_item_{$news_index}_image",
+            '画像',
+            "home_news_item_{$news_index}_image"
+        );
+        $front_page_fields[] = erotikava_acf_text(
+            "field_erotikava_home_news_item_{$news_index}_image_alt",
+            '画像alt',
+            "home_news_item_{$news_index}_image_alt"
+        );
+        $front_page_fields[] = erotikava_acf_link(
+            "field_erotikava_home_news_item_{$news_index}_link",
+            'リンク',
+            "home_news_item_{$news_index}_link"
+        );
+        $front_page_fields[] = erotikava_acf_true_false(
+            "field_erotikava_home_news_item_{$news_index}_open_new_tab",
+            '新しいタブで開く',
+            "home_news_item_{$news_index}_open_new_tab"
+        );
+    }
+
     acf_add_local_field_group([
         'key' => 'group_erotikava_front_page',
         'title' => 'Erotikava トップページ',
-        'fields' => [
-            erotikava_acf_tab('field_erotikava_home_tab_hero', 'メインビジュアル'),
-            [
-                'key' => 'field_erotikava_home_hero_slides',
-                'label' => 'ヒーロースライド',
-                'name' => 'home_hero_slides',
-                'type' => 'repeater',
-                'layout' => 'row',
-                'button_label' => 'スライドを追加',
-                'sub_fields' => [
-                    erotikava_acf_image('field_erotikava_home_hero_slide_image', '画像', 'image'),
-                    erotikava_acf_image('field_erotikava_home_hero_slide_mobile_image', 'モバイル画像', 'mobile_image'),
-                    erotikava_acf_text('field_erotikava_home_hero_slide_alt', '画像alt', 'image_alt'),
-                    [
-                        'key' => 'field_erotikava_home_hero_slide_caption_lines',
-                        'label' => 'キャプション行',
-                        'name' => 'caption_lines',
-                        'type' => 'repeater',
-                        'layout' => 'table',
-                        'button_label' => '行を追加',
-                        'sub_fields' => [
-                            erotikava_acf_text('field_erotikava_home_hero_slide_caption_text', 'テキスト', 'text'),
-                        ],
-                    ],
-                    [
-                        'key' => 'field_erotikava_home_hero_slide_link',
-                        'label' => 'リンク',
-                        'name' => 'link',
-                        'type' => 'link',
-                        'return_format' => 'array',
-                    ],
-                ],
-            ],
-            erotikava_acf_tab('field_erotikava_home_tab_intro', 'イントロ'),
-            erotikava_acf_text('field_erotikava_home_intro_title', 'タイトル', 'home_intro_title'),
-            erotikava_acf_text('field_erotikava_home_intro_lead', 'リード', 'home_intro_lead'),
-            erotikava_acf_text('field_erotikava_home_intro_hours_badge', '営業時間バッジ', 'home_intro_hours_badge'),
-            erotikava_acf_text('field_erotikava_home_intro_cta_text', 'CTAテキスト', 'home_intro_cta_text'),
-            [
-                'key' => 'field_erotikava_home_intro_cta_link',
-                'label' => 'CTAリンク',
-                'name' => 'home_intro_cta_link',
-                'type' => 'link',
-                'return_format' => 'array',
-            ],
-            erotikava_acf_tab('field_erotikava_home_tab_features', '特徴カード'),
-            [
-                'key' => 'field_erotikava_home_features',
-                'label' => '特徴カード',
-                'name' => 'home_features',
-                'type' => 'repeater',
-                'layout' => 'row',
-                'button_label' => 'カードを追加',
-                'sub_fields' => [
-                    [
-                        'key' => 'field_erotikava_home_feature_card_type',
-                        'label' => 'カード種別',
-                        'name' => 'card_type',
-                        'type' => 'select',
-                        'choices' => [
-                            'text_background' => 'text_background',
-                            'image_only' => 'image_only',
-                        ],
-                        'default_value' => 'text_background',
-                        'return_format' => 'value',
-                        'ui' => 1,
-                    ],
-                    erotikava_acf_image('field_erotikava_home_feature_image', '画像', 'image'),
-                    erotikava_acf_text('field_erotikava_home_feature_image_alt', '画像alt', 'image_alt'),
-                    erotikava_acf_text('field_erotikava_home_feature_title', 'タイトル', 'title'),
-                    erotikava_acf_text('field_erotikava_home_feature_description', '説明', 'description', 'textarea', ['rows' => 3]),
-                ],
-            ],
-            erotikava_acf_tab('field_erotikava_home_tab_concept', 'コンセプト'),
-            erotikava_acf_text('field_erotikava_home_concept_eyebrow', 'アイブロウ', 'home_concept_eyebrow'),
-            erotikava_acf_text('field_erotikava_home_concept_title', 'タイトル', 'home_concept_title'),
-            erotikava_acf_text('field_erotikava_home_concept_text', '本文', 'home_concept_text', 'wysiwyg'),
-            erotikava_acf_image('field_erotikava_home_concept_image', '画像', 'home_concept_image'),
-            erotikava_acf_text('field_erotikava_home_concept_image_alt', '画像alt', 'home_concept_image_alt'),
-            erotikava_acf_tab('field_erotikava_home_tab_gallery', '店内ギャラリー'),
-            erotikava_acf_text('field_erotikava_home_gallery_eyebrow', 'アイブロウ', 'home_gallery_eyebrow'),
-            erotikava_acf_text('field_erotikava_home_gallery_title', 'タイトル', 'home_gallery_title'),
-            [
-                'key' => 'field_erotikava_home_gallery_images',
-                'label' => 'ギャラリー画像',
-                'name' => 'home_gallery_images',
-                'type' => 'repeater',
-                'layout' => 'table',
-                'button_label' => '画像を追加',
-                'sub_fields' => [
-                    erotikava_acf_image('field_erotikava_home_gallery_image', '画像', 'image'),
-                    erotikava_acf_text('field_erotikava_home_gallery_image_alt', '画像alt', 'image_alt'),
-                ],
-            ],
-            erotikava_acf_tab('field_erotikava_home_tab_news', 'ニュース'),
-            erotikava_acf_text('field_erotikava_home_news_eyebrow', 'アイブロウ', 'home_news_eyebrow'),
-            erotikava_acf_text('field_erotikava_home_news_title', 'タイトル', 'home_news_title'),
-            [
-                'key' => 'field_erotikava_home_news_items',
-                'label' => 'ニュース画像',
-                'name' => 'home_news_items',
-                'type' => 'repeater',
-                'layout' => 'row',
-                'button_label' => 'ニュースを追加',
-                'sub_fields' => [
-                    erotikava_acf_image('field_erotikava_home_news_item_image', '画像', 'image'),
-                    erotikava_acf_text('field_erotikava_home_news_item_image_alt', '画像alt', 'image_alt'),
-                    [
-                        'key' => 'field_erotikava_home_news_item_link',
-                        'label' => 'リンク',
-                        'name' => 'link',
-                        'type' => 'link',
-                        'return_format' => 'array',
-                    ],
-                    [
-                        'key' => 'field_erotikava_home_news_item_open_new_tab',
-                        'label' => '新しいタブで開く',
-                        'name' => 'open_new_tab',
-                        'type' => 'true_false',
-                        'ui' => 1,
-                    ],
-                ],
-            ],
-        ],
+        'fields' => $front_page_fields,
         'location' => [
             [
                 ['param' => 'page_type', 'operator' => '==', 'value' => 'front_page'],
+            ],
+            [
+                ['param' => 'page_template', 'operator' => '==', 'value' => 'page-home.php'],
             ],
         ],
         'position' => 'normal',
@@ -244,52 +320,60 @@ add_action('acf/init', function (): void {
         'active' => true,
     ]);
 
+    $profile_fields = [
+        erotikava_acf_tab('field_erotikava_profile_tab_intro', 'Erotikavaについて'),
+        erotikava_acf_text('field_erotikava_profile_intro_eyebrow', 'アイブロウ', 'profile_intro_eyebrow'),
+        erotikava_acf_text('field_erotikava_profile_intro_title', 'タイトル', 'profile_intro_title'),
+    ];
+
+    for ($paragraph_index = 1; $paragraph_index <= (int) ($limits['profile_intro_paragraphs'] ?? 0); $paragraph_index++) {
+        $profile_fields[] = erotikava_acf_text(
+            "field_erotikava_profile_intro_paragraph_{$paragraph_index}",
+            "本文段落 {$paragraph_index}",
+            "profile_intro_paragraph_{$paragraph_index}",
+            'textarea',
+            ['rows' => 3]
+        );
+    }
+
+    $profile_fields[] = erotikava_acf_tab('field_erotikava_profile_tab_categories', 'プロフィール一覧');
+    $profile_fields[] = erotikava_acf_text('field_erotikava_profile_section_eyebrow', 'アイブロウ', 'profile_section_eyebrow');
+    $profile_fields[] = erotikava_acf_text('field_erotikava_profile_section_title', 'タイトル', 'profile_section_title');
+
+    for ($category_index = 1; $category_index <= (int) ($limits['profile_categories'] ?? 0); $category_index++) {
+        $profile_fields[] = erotikava_acf_message(
+            "field_erotikava_profile_category_{$category_index}_heading",
+            "カテゴリー {$category_index}"
+        );
+        $profile_fields[] = erotikava_acf_text(
+            "field_erotikava_profile_category_{$category_index}_eyebrow",
+            '英字見出し',
+            "profile_category_{$category_index}_eyebrow"
+        );
+        $profile_fields[] = erotikava_acf_text(
+            "field_erotikava_profile_category_{$category_index}_title",
+            'タイトル',
+            "profile_category_{$category_index}_title"
+        );
+
+        for ($image_index = 1; $image_index <= (int) ($limits['profile_category_images'] ?? 0); $image_index++) {
+            $profile_fields[] = erotikava_acf_image(
+                "field_erotikava_profile_category_{$category_index}_image_{$image_index}",
+                "画像 {$image_index}",
+                "profile_category_{$category_index}_image_{$image_index}"
+            );
+            $profile_fields[] = erotikava_acf_text(
+                "field_erotikava_profile_category_{$category_index}_image_{$image_index}_alt",
+                "画像 {$image_index} alt",
+                "profile_category_{$category_index}_image_{$image_index}_alt"
+            );
+        }
+    }
+
     acf_add_local_field_group([
         'key' => 'group_erotikava_profile_page',
         'title' => 'Erotikava プロフィールページ',
-        'fields' => [
-            erotikava_acf_tab('field_erotikava_profile_tab_intro', 'Erotikavaについて'),
-            erotikava_acf_text('field_erotikava_profile_intro_eyebrow', 'アイブロウ', 'profile_intro_eyebrow'),
-            erotikava_acf_text('field_erotikava_profile_intro_title', 'タイトル', 'profile_intro_title'),
-            [
-                'key' => 'field_erotikava_profile_intro_paragraphs',
-                'label' => '本文段落',
-                'name' => 'profile_intro_paragraphs',
-                'type' => 'repeater',
-                'layout' => 'table',
-                'button_label' => '段落を追加',
-                'sub_fields' => [
-                    erotikava_acf_text('field_erotikava_profile_intro_paragraph_text', 'テキスト', 'text', 'textarea', ['rows' => 3]),
-                ],
-            ],
-            erotikava_acf_tab('field_erotikava_profile_tab_categories', 'プロフィール一覧'),
-            erotikava_acf_text('field_erotikava_profile_section_eyebrow', 'アイブロウ', 'profile_section_eyebrow'),
-            erotikava_acf_text('field_erotikava_profile_section_title', 'タイトル', 'profile_section_title'),
-            [
-                'key' => 'field_erotikava_profile_categories',
-                'label' => 'カテゴリー',
-                'name' => 'profile_categories',
-                'type' => 'repeater',
-                'layout' => 'row',
-                'button_label' => 'カテゴリーを追加',
-                'sub_fields' => [
-                    erotikava_acf_text('field_erotikava_profile_category_eyebrow', '英字見出し', 'category_eyebrow'),
-                    erotikava_acf_text('field_erotikava_profile_category_title', 'タイトル', 'category_title'),
-                    [
-                        'key' => 'field_erotikava_profile_category_images',
-                        'label' => '画像一覧',
-                        'name' => 'category_images',
-                        'type' => 'repeater',
-                        'layout' => 'table',
-                        'button_label' => '画像を追加',
-                        'sub_fields' => [
-                            erotikava_acf_image('field_erotikava_profile_category_image', '画像', 'image'),
-                            erotikava_acf_text('field_erotikava_profile_category_image_alt', '画像alt', 'image_alt'),
-                        ],
-                    ],
-                ],
-            ],
-        ],
+        'fields' => $profile_fields,
         'location' => [
             [
                 ['param' => 'page_template', 'operator' => '==', 'value' => 'page-profile.php'],
@@ -300,112 +384,116 @@ add_action('acf/init', function (): void {
         'active' => true,
     ]);
 
+    $menu_fields = [
+        erotikava_acf_tab('field_erotikava_menu_tab_system', '料金システム'),
+        erotikava_acf_text('field_erotikava_menu_system_eyebrow', 'アイブロウ', 'menu_system_eyebrow'),
+        erotikava_acf_text('field_erotikava_menu_system_title', 'タイトル', 'menu_system_title'),
+    ];
+
+    for ($tab_index = 1; $tab_index <= (int) ($limits['menu_system_tabs'] ?? 0); $tab_index++) {
+        $menu_fields[] = erotikava_acf_message(
+            "field_erotikava_menu_system_tab_{$tab_index}_heading",
+            "料金タブ {$tab_index}"
+        );
+        $menu_fields[] = erotikava_acf_text(
+            "field_erotikava_menu_system_tab_{$tab_index}_label",
+            'タブラベル',
+            "menu_system_tab_{$tab_index}_label"
+        );
+
+        for ($image_index = 1; $image_index <= (int) ($limits['menu_system_tab_images'] ?? 0); $image_index++) {
+            $menu_fields[] = erotikava_acf_image(
+                "field_erotikava_menu_system_tab_{$tab_index}_image_{$image_index}",
+                "画像 {$image_index}",
+                "menu_system_tab_{$tab_index}_image_{$image_index}"
+            );
+            $menu_fields[] = erotikava_acf_text(
+                "field_erotikava_menu_system_tab_{$tab_index}_image_{$image_index}_alt",
+                "画像 {$image_index} alt",
+                "menu_system_tab_{$tab_index}_image_{$image_index}_alt"
+            );
+        }
+    }
+
+    $menu_fields[] = erotikava_acf_tab('field_erotikava_menu_tab_vip', 'VIP個室');
+    $menu_fields[] = erotikava_acf_image('field_erotikava_menu_vip_image', '画像', 'menu_vip_image');
+    $menu_fields[] = erotikava_acf_text('field_erotikava_menu_vip_image_alt', '画像alt', 'menu_vip_image_alt');
+    $menu_fields[] = erotikava_acf_text('field_erotikava_menu_vip_eyebrow', 'アイブロウ', 'menu_vip_eyebrow');
+    $menu_fields[] = erotikava_acf_text('field_erotikava_menu_vip_title', 'タイトル', 'menu_vip_title');
+    $menu_fields[] = erotikava_acf_text('field_erotikava_menu_vip_main_text', 'メインテキスト', 'menu_vip_main_text');
+    $menu_fields[] = erotikava_acf_text('field_erotikava_menu_vip_campaign_text', 'キャンペーン文言', 'menu_vip_campaign_text');
+
+    $menu_fields[] = erotikava_acf_tab('field_erotikava_menu_tab_shisha', 'シーシャ');
+    $menu_fields[] = erotikava_acf_text('field_erotikava_menu_shisha_eyebrow', 'アイブロウ', 'menu_shisha_eyebrow');
+    $menu_fields[] = erotikava_acf_text('field_erotikava_menu_shisha_title', 'タイトル', 'menu_shisha_title');
+    for ($line_index = 1; $line_index <= (int) ($limits['menu_shisha_content'] ?? 0); $line_index++) {
+        $menu_fields[] = erotikava_acf_message(
+            "field_erotikava_menu_shisha_line_{$line_index}_heading",
+            "本文行 {$line_index}"
+        );
+        $menu_fields[] = erotikava_acf_text(
+            "field_erotikava_menu_shisha_line_{$line_index}_text",
+            'テキスト',
+            "menu_shisha_line_{$line_index}_text"
+        );
+        $menu_fields[] = erotikava_acf_select(
+            "field_erotikava_menu_shisha_line_{$line_index}_style",
+            'スタイル',
+            "menu_shisha_line_{$line_index}_style",
+            [
+                'normal' => 'normal',
+                'note' => 'note',
+                'large' => 'large',
+                'campaign' => 'campaign',
+            ]
+        );
+    }
+    $menu_fields[] = erotikava_acf_image('field_erotikava_menu_shisha_image', '画像', 'menu_shisha_image');
+    $menu_fields[] = erotikava_acf_text('field_erotikava_menu_shisha_image_alt', '画像alt', 'menu_shisha_image_alt');
+
+    $menu_fields[] = erotikava_acf_tab('field_erotikava_menu_tab_food', 'お食事メニュー');
+    $menu_fields[] = erotikava_acf_text('field_erotikava_menu_food_eyebrow', 'アイブロウ', 'menu_food_eyebrow');
+    $menu_fields[] = erotikava_acf_text('field_erotikava_menu_food_title', 'タイトル', 'menu_food_title');
+    for ($image_index = 1; $image_index <= (int) ($limits['menu_food_images'] ?? 0); $image_index++) {
+        $menu_fields[] = erotikava_acf_image(
+            "field_erotikava_menu_food_image_{$image_index}",
+            "画像 {$image_index}",
+            "menu_food_image_{$image_index}"
+        );
+        $menu_fields[] = erotikava_acf_text(
+            "field_erotikava_menu_food_image_{$image_index}_alt",
+            "画像 {$image_index} alt",
+            "menu_food_image_{$image_index}_alt"
+        );
+    }
+
+    $menu_fields[] = erotikava_acf_tab('field_erotikava_menu_tab_drink', 'カクテル・ドリンク');
+    $menu_fields[] = erotikava_acf_text('field_erotikava_menu_drink_eyebrow', 'アイブロウ', 'menu_drink_eyebrow');
+    $menu_fields[] = erotikava_acf_text('field_erotikava_menu_drink_title', 'タイトル', 'menu_drink_title');
+    $menu_fields[] = erotikava_acf_image('field_erotikava_menu_drink_main_image', 'メイン画像', 'menu_drink_main_image');
+    $menu_fields[] = erotikava_acf_text('field_erotikava_menu_drink_main_image_alt', 'メイン画像alt', 'menu_drink_main_image_alt');
+    $menu_fields[] = erotikava_acf_text('field_erotikava_menu_drink_featured_title', '注目タイトル', 'menu_drink_featured_title');
+    $menu_fields[] = erotikava_acf_text('field_erotikava_menu_drink_description', '説明', 'menu_drink_description', 'textarea', ['rows' => 3]);
+    $menu_fields[] = erotikava_acf_text('field_erotikava_menu_drink_price_text', '価格テキスト', 'menu_drink_price_text');
+    $menu_fields[] = erotikava_acf_text('field_erotikava_menu_drink_types_text', 'ドリンク種類テキスト', 'menu_drink_types_text', 'textarea', ['rows' => 4]);
+    $menu_fields[] = erotikava_acf_text('field_erotikava_menu_drink_note', '注記', 'menu_drink_note', 'textarea', ['rows' => 3]);
+    for ($image_index = 1; $image_index <= (int) ($limits['menu_drink_gallery'] ?? 0); $image_index++) {
+        $menu_fields[] = erotikava_acf_image(
+            "field_erotikava_menu_drink_gallery_image_{$image_index}",
+            "ギャラリー画像 {$image_index}",
+            "menu_drink_gallery_image_{$image_index}"
+        );
+        $menu_fields[] = erotikava_acf_text(
+            "field_erotikava_menu_drink_gallery_image_{$image_index}_alt",
+            "ギャラリー画像 {$image_index} alt",
+            "menu_drink_gallery_image_{$image_index}_alt"
+        );
+    }
+
     acf_add_local_field_group([
         'key' => 'group_erotikava_menu_page',
         'title' => 'Erotikava メニュー・料金ページ',
-        'fields' => [
-            erotikava_acf_tab('field_erotikava_menu_tab_system', '料金システム'),
-            erotikava_acf_text('field_erotikava_menu_system_eyebrow', 'アイブロウ', 'menu_system_eyebrow'),
-            erotikava_acf_text('field_erotikava_menu_system_title', 'タイトル', 'menu_system_title'),
-            [
-                'key' => 'field_erotikava_menu_system_tabs',
-                'label' => '料金タブ',
-                'name' => 'menu_system_tabs',
-                'type' => 'repeater',
-                'layout' => 'row',
-                'button_label' => 'タブを追加',
-                'sub_fields' => [
-                    erotikava_acf_text('field_erotikava_menu_system_tab_label', 'タブラベル', 'tab_label'),
-                    [
-                        'key' => 'field_erotikava_menu_system_tab_images',
-                        'label' => 'タブ画像',
-                        'name' => 'tab_images',
-                        'type' => 'repeater',
-                        'layout' => 'table',
-                        'button_label' => '画像を追加',
-                        'sub_fields' => [
-                            erotikava_acf_image('field_erotikava_menu_system_tab_image', '画像', 'image'),
-                            erotikava_acf_text('field_erotikava_menu_system_tab_image_alt', '画像alt', 'image_alt'),
-                        ],
-                    ],
-                ],
-            ],
-            erotikava_acf_tab('field_erotikava_menu_tab_vip', 'VIP個室'),
-            erotikava_acf_image('field_erotikava_menu_vip_image', '画像', 'menu_vip_image'),
-            erotikava_acf_text('field_erotikava_menu_vip_image_alt', '画像alt', 'menu_vip_image_alt'),
-            erotikava_acf_text('field_erotikava_menu_vip_eyebrow', 'アイブロウ', 'menu_vip_eyebrow'),
-            erotikava_acf_text('field_erotikava_menu_vip_title', 'タイトル', 'menu_vip_title'),
-            erotikava_acf_text('field_erotikava_menu_vip_main_text', 'メインテキスト', 'menu_vip_main_text'),
-            erotikava_acf_text('field_erotikava_menu_vip_campaign_text', 'キャンペーン文言', 'menu_vip_campaign_text'),
-            erotikava_acf_tab('field_erotikava_menu_tab_shisha', 'シーシャ'),
-            erotikava_acf_text('field_erotikava_menu_shisha_eyebrow', 'アイブロウ', 'menu_shisha_eyebrow'),
-            erotikava_acf_text('field_erotikava_menu_shisha_title', 'タイトル', 'menu_shisha_title'),
-            [
-                'key' => 'field_erotikava_menu_shisha_content',
-                'label' => '本文行',
-                'name' => 'menu_shisha_content',
-                'type' => 'repeater',
-                'layout' => 'table',
-                'button_label' => '行を追加',
-                'sub_fields' => [
-                    erotikava_acf_text('field_erotikava_menu_shisha_content_text', 'テキスト', 'text'),
-                    [
-                        'key' => 'field_erotikava_menu_shisha_content_style',
-                        'label' => 'スタイル',
-                        'name' => 'style',
-                        'type' => 'select',
-                        'choices' => [
-                            'normal' => 'normal',
-                            'note' => 'note',
-                            'large' => 'large',
-                            'campaign' => 'campaign',
-                        ],
-                        'default_value' => 'normal',
-                        'return_format' => 'value',
-                        'ui' => 1,
-                    ],
-                ],
-            ],
-            erotikava_acf_image('field_erotikava_menu_shisha_image', '画像', 'menu_shisha_image'),
-            erotikava_acf_text('field_erotikava_menu_shisha_image_alt', '画像alt', 'menu_shisha_image_alt'),
-            erotikava_acf_tab('field_erotikava_menu_tab_food', 'お食事メニュー'),
-            erotikava_acf_text('field_erotikava_menu_food_eyebrow', 'アイブロウ', 'menu_food_eyebrow'),
-            erotikava_acf_text('field_erotikava_menu_food_title', 'タイトル', 'menu_food_title'),
-            [
-                'key' => 'field_erotikava_menu_food_images',
-                'label' => 'フード画像',
-                'name' => 'menu_food_images',
-                'type' => 'repeater',
-                'layout' => 'table',
-                'button_label' => '画像を追加',
-                'sub_fields' => [
-                    erotikava_acf_image('field_erotikava_menu_food_image', '画像', 'image'),
-                    erotikava_acf_text('field_erotikava_menu_food_image_alt', '画像alt', 'image_alt'),
-                ],
-            ],
-            erotikava_acf_tab('field_erotikava_menu_tab_drink', 'カクテル・ドリンク'),
-            erotikava_acf_text('field_erotikava_menu_drink_eyebrow', 'アイブロウ', 'menu_drink_eyebrow'),
-            erotikava_acf_text('field_erotikava_menu_drink_title', 'タイトル', 'menu_drink_title'),
-            erotikava_acf_image('field_erotikava_menu_drink_main_image', 'メイン画像', 'menu_drink_main_image'),
-            erotikava_acf_text('field_erotikava_menu_drink_main_image_alt', 'メイン画像alt', 'menu_drink_main_image_alt'),
-            erotikava_acf_text('field_erotikava_menu_drink_featured_title', '注目タイトル', 'menu_drink_featured_title'),
-            erotikava_acf_text('field_erotikava_menu_drink_description', '説明', 'menu_drink_description', 'textarea', ['rows' => 3]),
-            erotikava_acf_text('field_erotikava_menu_drink_price_text', '価格テキスト', 'menu_drink_price_text'),
-            erotikava_acf_text('field_erotikava_menu_drink_types_text', 'ドリンク種類テキスト', 'menu_drink_types_text', 'textarea', ['rows' => 4]),
-            erotikava_acf_text('field_erotikava_menu_drink_note', '注記', 'menu_drink_note', 'textarea', ['rows' => 3]),
-            [
-                'key' => 'field_erotikava_menu_drink_gallery',
-                'label' => 'ドリンクギャラリー',
-                'name' => 'menu_drink_gallery',
-                'type' => 'repeater',
-                'layout' => 'table',
-                'button_label' => '画像を追加',
-                'sub_fields' => [
-                    erotikava_acf_image('field_erotikava_menu_drink_gallery_image', '画像', 'image'),
-                    erotikava_acf_text('field_erotikava_menu_drink_gallery_image_alt', '画像alt', 'image_alt'),
-                ],
-            ],
-        ],
+        'fields' => $menu_fields,
         'location' => [
             [
                 ['param' => 'page_template', 'operator' => '==', 'value' => 'page-menu.php'],
@@ -416,4 +504,3 @@ add_action('acf/init', function (): void {
         'active' => true,
     ]);
 });
-

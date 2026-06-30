@@ -2,7 +2,7 @@
 
 defined('ABSPATH') || exit;
 
-define('EROTIKAVA_THEME_VERSION', '1.0.0');
+define('EROTIKAVA_THEME_VERSION', '1.0.4');
 define('EROTIKAVA_THEME_DIR', get_template_directory());
 define('EROTIKAVA_THEME_URI', get_template_directory_uri());
 define('EROTIKAVA_REMOTE_SITE_URL', 'https://keikokamiya-spec.github.io/Erotikava/');
@@ -75,7 +75,7 @@ add_action('admin_notices', function (): void {
 
     printf(
         '<div class="notice notice-warning"><p>%s</p></div>',
-        esc_html__('Erotikava Theme requires ACF PRO for editable page content and event management. The front-end still uses static fallback content until ACF is activated.', 'erotikava-theme')
+        esc_html__('Erotikava Theme requires Advanced Custom Fields to edit page content and event data. The free version is supported, and the front-end uses fallback content until ACF is activated.', 'erotikava-theme')
     );
 });
 

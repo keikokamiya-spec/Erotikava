@@ -5,14 +5,40 @@ defined('ABSPATH') || exit;
 $post_id = get_queried_object_id();
 $defaults = erotikava_get_page_defaults('home');
 $use_defaults = erotikava_use_seed_defaults();
-$fallback_repeaters = $use_defaults ? $defaults : [];
-$hero_slides = erotikava_get_repeater_value('home_hero_slides', $fallback_repeaters['hero_slides'] ?? [], $post_id);
+$limits = erotikava_get_content_limits();
+$hero_slides = $use_defaults
+    ? ($defaults['hero_slides'] ?? [])
+    : erotikava_collect_fixed_items((int) ($limits['home_hero_slides'] ?? 0), function (int $index) use ($limits, $post_id): array {
+        $caption_lines = erotikava_collect_fixed_items((int) ($limits['home_hero_caption_lines'] ?? 0), function (int $line_index) use ($index, $post_id): array {
+            return [
+                'text' => (string) erotikava_get_field_value("home_hero_slide_{$index}_caption_{$line_index}", '', $post_id),
+            ];
+        });
+
+        return [
+            'image' => (int) erotikava_get_field_value("home_hero_slide_{$index}_image", 0, $post_id),
+            'mobile_image' => (int) erotikava_get_field_value("home_hero_slide_{$index}_mobile_image", 0, $post_id),
+            'image_alt' => (string) erotikava_get_field_value("home_hero_slide_{$index}_image_alt", '', $post_id),
+            'caption_lines' => $caption_lines,
+            'link' => erotikava_get_link_value("home_hero_slide_{$index}_link", [], $post_id),
+        ];
+    });
 $home_intro_title = (string) erotikava_get_field_value('home_intro_title', $use_defaults ? ($defaults['intro_title'] ?? '') : '', $post_id);
 $home_intro_lead = (string) erotikava_get_field_value('home_intro_lead', $use_defaults ? ($defaults['intro_lead'] ?? '') : '', $post_id);
 $home_intro_hours_badge = (string) erotikava_get_field_value('home_intro_hours_badge', $use_defaults ? ($defaults['intro_hours_badge'] ?? '') : '', $post_id);
 $home_intro_cta_text = (string) erotikava_get_field_value('home_intro_cta_text', $use_defaults ? ($defaults['intro_cta_text'] ?? '') : '', $post_id);
-$home_intro_cta_link = erotikava_get_field_value('home_intro_cta_link', $use_defaults ? erotikava_make_link_value(erotikava_get_page_url('reservations') . '#event-calendar', $home_intro_cta_text) : [], $post_id);
-$home_features = erotikava_get_repeater_value('home_features', $fallback_repeaters['features'] ?? [], $post_id);
+$home_intro_cta_link = erotikava_get_link_value('home_intro_cta_link', $use_defaults ? erotikava_make_link_value(erotikava_get_page_url('reservations') . '#event-calendar', $home_intro_cta_text) : [], $post_id);
+$home_features = $use_defaults
+    ? ($defaults['features'] ?? [])
+    : erotikava_collect_fixed_items((int) ($limits['home_features'] ?? 0), function (int $index) use ($post_id): array {
+        return [
+            'card_type' => (string) erotikava_get_field_value("home_feature_{$index}_card_type", '', $post_id),
+            'image' => (int) erotikava_get_field_value("home_feature_{$index}_image", 0, $post_id),
+            'image_alt' => (string) erotikava_get_field_value("home_feature_{$index}_image_alt", '', $post_id),
+            'title' => (string) erotikava_get_field_value("home_feature_{$index}_title", '', $post_id),
+            'description' => (string) erotikava_get_field_value("home_feature_{$index}_description", '', $post_id),
+        ];
+    });
 $home_concept_eyebrow = (string) erotikava_get_field_value('home_concept_eyebrow', $use_defaults ? ($defaults['concept_eyebrow'] ?? '') : '', $post_id);
 $home_concept_title = (string) erotikava_get_field_value('home_concept_title', $use_defaults ? ($defaults['concept_title'] ?? '') : '', $post_id);
 $home_concept_text = (string) erotikava_get_field_value('home_concept_text', $use_defaults ? ($defaults['concept_text'] ?? '') : '', $post_id);
@@ -20,10 +46,26 @@ $home_concept_image = (int) erotikava_get_field_value('home_concept_image', 0, $
 $home_concept_image_alt = (string) erotikava_get_field_value('home_concept_image_alt', $use_defaults ? ($defaults['concept_image_alt'] ?? '') : '', $post_id);
 $home_gallery_eyebrow = (string) erotikava_get_field_value('home_gallery_eyebrow', $use_defaults ? ($defaults['gallery_eyebrow'] ?? '') : '', $post_id);
 $home_gallery_title = (string) erotikava_get_field_value('home_gallery_title', $use_defaults ? ($defaults['gallery_title'] ?? '') : '', $post_id);
-$home_gallery_images = erotikava_get_repeater_value('home_gallery_images', $fallback_repeaters['gallery_images'] ?? [], $post_id);
+$home_gallery_images = $use_defaults
+    ? ($defaults['gallery_images'] ?? [])
+    : erotikava_collect_fixed_items((int) ($limits['home_gallery_images'] ?? 0), function (int $index) use ($post_id): array {
+        return [
+            'image' => (int) erotikava_get_field_value("home_gallery_image_{$index}", 0, $post_id),
+            'image_alt' => (string) erotikava_get_field_value("home_gallery_image_{$index}_alt", '', $post_id),
+        ];
+    });
 $home_news_eyebrow = (string) erotikava_get_field_value('home_news_eyebrow', $use_defaults ? ($defaults['news_eyebrow'] ?? '') : '', $post_id);
 $home_news_title = (string) erotikava_get_field_value('home_news_title', $use_defaults ? ($defaults['news_title'] ?? '') : '', $post_id);
-$home_news_items = erotikava_get_repeater_value('home_news_items', $fallback_repeaters['news_items'] ?? [], $post_id);
+$home_news_items = $use_defaults
+    ? ($defaults['news_items'] ?? [])
+    : erotikava_collect_fixed_items((int) ($limits['home_news_items'] ?? 0), function (int $index) use ($post_id): array {
+        return [
+            'image' => (int) erotikava_get_field_value("home_news_item_{$index}_image", 0, $post_id),
+            'image_alt' => (string) erotikava_get_field_value("home_news_item_{$index}_image_alt", '', $post_id),
+            'link' => erotikava_get_link_value("home_news_item_{$index}_link", [], $post_id),
+            'open_new_tab' => (bool) erotikava_get_field_value("home_news_item_{$index}_open_new_tab", false, $post_id),
+        ];
+    });
 $store = erotikava_get_store_data();
 
 get_header();

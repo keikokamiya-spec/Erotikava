@@ -159,6 +159,83 @@ if (! function_exists('erotikava_get_repeater_value')) {
     }
 }
 
+if (! function_exists('erotikava_get_link_value')) {
+    function erotikava_get_link_value(string $field_name, array $default = [], int|string|null $post_id = null): array
+    {
+        $value = erotikava_get_field_value($field_name, $default, $post_id);
+        return is_array($value) ? $value : $default;
+    }
+}
+
+if (! function_exists('erotikava_get_content_limits')) {
+    function erotikava_get_content_limits(): array
+    {
+        return [
+            'home_hero_slides' => 5,
+            'home_hero_caption_lines' => 5,
+            'home_features' => 6,
+            'home_gallery_images' => 12,
+            'home_news_items' => 8,
+            'profile_intro_paragraphs' => 6,
+            'profile_categories' => 4,
+            'profile_category_images' => 16,
+            'menu_system_tabs' => 4,
+            'menu_system_tab_images' => 4,
+            'menu_shisha_content' => 8,
+            'menu_food_images' => 6,
+            'menu_drink_gallery' => 8,
+        ];
+    }
+}
+
+if (! function_exists('erotikava_has_content')) {
+    function erotikava_has_content(mixed $value): bool
+    {
+        if (is_array($value)) {
+            foreach ($value as $item) {
+                if (erotikava_has_content($item)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        if (is_string($value)) {
+            return trim($value) !== '';
+        }
+
+        if (is_int($value) || is_float($value)) {
+            return $value > 0;
+        }
+
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        return $value !== null;
+    }
+}
+
+if (! function_exists('erotikava_collect_fixed_items')) {
+    function erotikava_collect_fixed_items(int $max_items, callable $resolver): array
+    {
+        $items = [];
+
+        for ($index = 1; $index <= $max_items; $index++) {
+            $item = $resolver($index);
+
+            if (! is_array($item) || ! erotikava_has_content($item)) {
+                continue;
+            }
+
+            $items[] = $item;
+        }
+
+        return $items;
+    }
+}
+
 if (! function_exists('erotikava_get_image_alt')) {
     function erotikava_get_image_alt(int $image_id, string $fallback = ''): string
     {

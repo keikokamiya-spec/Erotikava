@@ -9,9 +9,24 @@ $post_id = get_queried_object_id();
 $hero = erotikava_get_page_hero_data('menu', $post_id);
 $defaults = erotikava_get_page_defaults('menu');
 $use_defaults = erotikava_use_seed_defaults();
+$limits = erotikava_get_content_limits();
 $menu_system_eyebrow = (string) erotikava_get_field_value('menu_system_eyebrow', $use_defaults ? ($defaults['system_eyebrow'] ?? '') : '', $post_id);
 $menu_system_title = (string) erotikava_get_field_value('menu_system_title', $use_defaults ? ($defaults['system_title'] ?? '') : '', $post_id);
-$menu_system_tabs = erotikava_get_repeater_value('menu_system_tabs', $use_defaults ? ($defaults['system_tabs'] ?? []) : [], $post_id);
+$menu_system_tabs = $use_defaults
+    ? ($defaults['system_tabs'] ?? [])
+    : erotikava_collect_fixed_items((int) ($limits['menu_system_tabs'] ?? 0), function (int $index) use ($limits, $post_id): array {
+        $images = erotikava_collect_fixed_items((int) ($limits['menu_system_tab_images'] ?? 0), function (int $image_index) use ($index, $post_id): array {
+            return [
+                'image' => (int) erotikava_get_field_value("menu_system_tab_{$index}_image_{$image_index}", 0, $post_id),
+                'image_alt' => (string) erotikava_get_field_value("menu_system_tab_{$index}_image_{$image_index}_alt", '', $post_id),
+            ];
+        });
+
+        return [
+            'tab_label' => (string) erotikava_get_field_value("menu_system_tab_{$index}_label", '', $post_id),
+            'tab_images' => $images,
+        ];
+    });
 $menu_vip_image_alt = (string) erotikava_get_field_value('menu_vip_image_alt', $use_defaults ? ($defaults['vip_image_alt'] ?? '') : '', $post_id);
 $menu_vip_eyebrow = (string) erotikava_get_field_value('menu_vip_eyebrow', $use_defaults ? ($defaults['vip_eyebrow'] ?? '') : '', $post_id);
 $menu_vip_title = (string) erotikava_get_field_value('menu_vip_title', $use_defaults ? ($defaults['vip_title'] ?? '') : '', $post_id);
@@ -20,12 +35,26 @@ $menu_vip_campaign_text = (string) erotikava_get_field_value('menu_vip_campaign_
 $menu_vip_image = (int) erotikava_get_field_value('menu_vip_image', 0, $post_id);
 $menu_shisha_eyebrow = (string) erotikava_get_field_value('menu_shisha_eyebrow', $use_defaults ? ($defaults['shisha_eyebrow'] ?? '') : '', $post_id);
 $menu_shisha_title = (string) erotikava_get_field_value('menu_shisha_title', $use_defaults ? ($defaults['shisha_title'] ?? '') : '', $post_id);
-$menu_shisha_content = erotikava_get_repeater_value('menu_shisha_content', $use_defaults ? ($defaults['shisha_content'] ?? []) : [], $post_id);
+$menu_shisha_content = $use_defaults
+    ? ($defaults['shisha_content'] ?? [])
+    : erotikava_collect_fixed_items((int) ($limits['menu_shisha_content'] ?? 0), function (int $index) use ($post_id): array {
+        return [
+            'text' => (string) erotikava_get_field_value("menu_shisha_line_{$index}_text", '', $post_id),
+            'style' => (string) erotikava_get_field_value("menu_shisha_line_{$index}_style", '', $post_id),
+        ];
+    });
 $menu_shisha_image = (int) erotikava_get_field_value('menu_shisha_image', 0, $post_id);
 $menu_shisha_image_alt = (string) erotikava_get_field_value('menu_shisha_image_alt', $use_defaults ? ($defaults['shisha_image_alt'] ?? '') : '', $post_id);
 $menu_food_eyebrow = (string) erotikava_get_field_value('menu_food_eyebrow', $use_defaults ? ($defaults['food_eyebrow'] ?? '') : '', $post_id);
 $menu_food_title = (string) erotikava_get_field_value('menu_food_title', $use_defaults ? ($defaults['food_title'] ?? '') : '', $post_id);
-$menu_food_images = erotikava_get_repeater_value('menu_food_images', $use_defaults ? ($defaults['food_images'] ?? []) : [], $post_id);
+$menu_food_images = $use_defaults
+    ? ($defaults['food_images'] ?? [])
+    : erotikava_collect_fixed_items((int) ($limits['menu_food_images'] ?? 0), function (int $index) use ($post_id): array {
+        return [
+            'image' => (int) erotikava_get_field_value("menu_food_image_{$index}", 0, $post_id),
+            'image_alt' => (string) erotikava_get_field_value("menu_food_image_{$index}_alt", '', $post_id),
+        ];
+    });
 $menu_drink_eyebrow = (string) erotikava_get_field_value('menu_drink_eyebrow', $use_defaults ? ($defaults['drink_eyebrow'] ?? '') : '', $post_id);
 $menu_drink_title = (string) erotikava_get_field_value('menu_drink_title', $use_defaults ? ($defaults['drink_title'] ?? '') : '', $post_id);
 $menu_drink_main_image = (int) erotikava_get_field_value('menu_drink_main_image', 0, $post_id);
@@ -35,7 +64,14 @@ $menu_drink_description = (string) erotikava_get_field_value('menu_drink_descrip
 $menu_drink_price_text = (string) erotikava_get_field_value('menu_drink_price_text', $use_defaults ? ($defaults['drink_price_text'] ?? '') : '', $post_id);
 $menu_drink_types_text = (string) erotikava_get_field_value('menu_drink_types_text', $use_defaults ? ($defaults['drink_types_text'] ?? '') : '', $post_id);
 $menu_drink_note = (string) erotikava_get_field_value('menu_drink_note', $use_defaults ? ($defaults['drink_note'] ?? '') : '', $post_id);
-$menu_drink_gallery = erotikava_get_repeater_value('menu_drink_gallery', $use_defaults ? ($defaults['drink_gallery'] ?? []) : [], $post_id);
+$menu_drink_gallery = $use_defaults
+    ? ($defaults['drink_gallery'] ?? [])
+    : erotikava_collect_fixed_items((int) ($limits['menu_drink_gallery'] ?? 0), function (int $index) use ($post_id): array {
+        return [
+            'image' => (int) erotikava_get_field_value("menu_drink_gallery_image_{$index}", 0, $post_id),
+            'image_alt' => (string) erotikava_get_field_value("menu_drink_gallery_image_{$index}_alt", '', $post_id),
+        ];
+    });
 
 get_header();
 ?>

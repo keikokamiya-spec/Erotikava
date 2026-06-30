@@ -393,6 +393,15 @@ if (! function_exists('erotikava_seed_field_if_empty')) {
     }
 }
 
+if (! function_exists('erotikava_seed_fields_if_empty')) {
+    function erotikava_seed_fields_if_empty(int $post_id, array $field_values, array &$messages): void
+    {
+        foreach ($field_values as $field_name => $value) {
+            erotikava_seed_field_if_empty($post_id, (string) $field_name, $value, $messages);
+        }
+    }
+}
+
 if (! function_exists('erotikava_find_or_create_page')) {
     function erotikava_find_or_create_page(string $slug, string $title, string $template = ''): int
     {
@@ -416,6 +425,242 @@ if (! function_exists('erotikava_find_or_create_page')) {
     }
 }
 
+if (! function_exists('erotikava_get_theme_page_definitions')) {
+    function erotikava_get_theme_page_definitions(): array
+    {
+        return [
+            'home' => [
+                'title' => 'トップ',
+                'template' => 'page-home.php',
+            ],
+            'reservations' => [
+                'title' => 'イベント・日程',
+                'template' => 'page-reservations.php',
+            ],
+            'profile' => [
+                'title' => 'プロフィール',
+                'template' => 'page-profile.php',
+            ],
+            'menu' => [
+                'title' => 'メニュー・料金',
+                'template' => 'page-menu.php',
+            ],
+        ];
+    }
+}
+
+if (! function_exists('erotikava_sync_theme_pages')) {
+    function erotikava_sync_theme_pages(bool $set_front_page = true): array
+    {
+        $page_ids = [];
+
+        foreach (erotikava_get_theme_page_definitions() as $slug => $page_definition) {
+            $page_ids[$slug] = erotikava_find_or_create_page(
+                (string) $slug,
+                (string) ($page_definition['title'] ?? $slug),
+                (string) ($page_definition['template'] ?? '')
+            );
+        }
+
+        if ($set_front_page && ! empty($page_ids['home'])) {
+            update_option('show_on_front', 'page');
+            update_option('page_on_front', (int) $page_ids['home']);
+        }
+
+        return $page_ids;
+    }
+}
+
+if (! function_exists('erotikava_get_theme_page_id')) {
+    function erotikava_get_theme_page_id(string $slug): int
+    {
+        $page = get_page_by_path($slug);
+        return $page instanceof WP_Post ? (int) $page->ID : 0;
+    }
+}
+
+if (! function_exists('erotikava_is_managed_content_page')) {
+    function erotikava_is_managed_content_page(WP_Post|int|null $post): bool
+    {
+        $post_obj = $post instanceof WP_Post ? $post : get_post($post);
+        if (! $post_obj instanceof WP_Post || $post_obj->post_type !== 'page') {
+            return false;
+        }
+
+        return in_array($post_obj->post_name, array_keys(erotikava_get_content_editor_menu_items()), true);
+    }
+}
+
+if (! function_exists('erotikava_ensure_theme_page')) {
+    function erotikava_ensure_theme_page(string $slug): int
+    {
+        $definitions = erotikava_get_theme_page_definitions();
+        $page_definition = $definitions[$slug] ?? null;
+
+        if (! is_array($page_definition)) {
+            return 0;
+        }
+
+        $existing_id = erotikava_get_theme_page_id($slug);
+        if ($existing_id > 0) {
+            if (! empty($page_definition['template'])) {
+                update_post_meta($existing_id, '_wp_page_template', (string) $page_definition['template']);
+            }
+
+            return $existing_id;
+        }
+
+        return erotikava_find_or_create_page(
+            $slug,
+            (string) ($page_definition['title'] ?? $slug),
+            (string) ($page_definition['template'] ?? '')
+        );
+    }
+}
+
+if (! function_exists('erotikava_get_content_editor_menu_items')) {
+    function erotikava_get_content_editor_menu_items(): array
+    {
+        return [
+            'home' => [
+                'page_title' => 'トップを編集',
+                'menu_title' => 'トップ',
+                'capability' => 'edit_pages',
+                'menu_slug' => 'erotikava-edit-home',
+                'icon' => 'dashicons-admin-home',
+                'position' => 21,
+            ],
+            'profile' => [
+                'page_title' => 'プロフィールを編集',
+                'menu_title' => 'プロフィール',
+                'capability' => 'edit_pages',
+                'menu_slug' => 'erotikava-edit-profile',
+                'icon' => 'dashicons-id',
+                'position' => 22,
+            ],
+            'menu' => [
+                'page_title' => 'メニュー・料金を編集',
+                'menu_title' => 'メニュー・料金',
+                'capability' => 'edit_pages',
+                'menu_slug' => 'erotikava-edit-menu',
+                'icon' => 'dashicons-food',
+                'position' => 23,
+            ],
+        ];
+    }
+}
+
+if (! function_exists('erotikava_render_content_editor_menu_page')) {
+    function erotikava_render_content_editor_menu_page(): void
+    {
+        wp_die('ページ編集画面へ移動できませんでした。');
+    }
+}
+
+if (! function_exists('erotikava_register_content_editor_menus')) {
+    function erotikava_register_content_editor_menus(): void
+    {
+        foreach (erotikava_get_content_editor_menu_items() as $slug => $menu_item) {
+            $capability = (string) ($menu_item['capability'] ?? 'edit_pages');
+            if (! current_user_can($capability)) {
+                continue;
+            }
+
+            $menu_slug = (string) ($menu_item['menu_slug'] ?? '');
+            if ($menu_slug === '') {
+                continue;
+            }
+
+            $hook = add_menu_page(
+                (string) ($menu_item['page_title'] ?? $slug),
+                (string) ($menu_item['menu_title'] ?? $slug),
+                $capability,
+                $menu_slug,
+                'erotikava_render_content_editor_menu_page',
+                (string) ($menu_item['icon'] ?? 'dashicons-admin-page'),
+                (int) ($menu_item['position'] ?? null)
+            );
+
+            add_action("load-{$hook}", static function () use ($slug): void {
+                $page_id = erotikava_ensure_theme_page($slug);
+
+                if ($page_id <= 0) {
+                    wp_die('編集対象ページを作成できませんでした。');
+                }
+
+                wp_safe_redirect(admin_url('post.php?post=' . $page_id . '&action=edit'));
+                exit;
+            });
+        }
+    }
+}
+add_action('admin_menu', 'erotikava_register_content_editor_menus', 20);
+
+if (! function_exists('erotikava_set_active_content_editor_menu')) {
+    function erotikava_set_active_content_editor_menu(): void
+    {
+        if (! is_admin()) {
+            return;
+        }
+
+        $screen = get_current_screen();
+        if (! $screen instanceof WP_Screen || $screen->base !== 'post' || $screen->post_type !== 'page') {
+            return;
+        }
+
+        $post_id = isset($_GET['post']) ? (int) $_GET['post'] : 0;
+        if ($post_id <= 0) {
+            return;
+        }
+
+        $slug = (string) get_post_field('post_name', $post_id);
+        $menu_items = erotikava_get_content_editor_menu_items();
+
+        if (! isset($menu_items[$slug]['menu_slug'])) {
+            return;
+        }
+
+        $GLOBALS['erotikava_active_editor_menu_slug'] = (string) $menu_items[$slug]['menu_slug'];
+    }
+}
+add_action('current_screen', 'erotikava_set_active_content_editor_menu');
+
+if (! function_exists('erotikava_filter_active_content_editor_parent_file')) {
+    function erotikava_filter_active_content_editor_parent_file(string $parent_file): string
+    {
+        return isset($GLOBALS['erotikava_active_editor_menu_slug'])
+            ? (string) $GLOBALS['erotikava_active_editor_menu_slug']
+            : $parent_file;
+    }
+}
+add_filter('parent_file', 'erotikava_filter_active_content_editor_parent_file');
+
+if (! function_exists('erotikava_filter_active_content_editor_submenu_file')) {
+    function erotikava_filter_active_content_editor_submenu_file(?string $submenu_file): ?string
+    {
+        return isset($GLOBALS['erotikava_active_editor_menu_slug'])
+            ? (string) $GLOBALS['erotikava_active_editor_menu_slug']
+            : $submenu_file;
+    }
+}
+add_filter('submenu_file', 'erotikava_filter_active_content_editor_submenu_file');
+
+if (! function_exists('erotikava_disable_block_editor_for_managed_pages')) {
+    function erotikava_disable_block_editor_for_managed_pages(bool $use_block_editor, WP_Post $post): bool
+    {
+        return erotikava_is_managed_content_page($post) ? false : $use_block_editor;
+    }
+}
+add_filter('use_block_editor_for_post', 'erotikava_disable_block_editor_for_managed_pages', 10, 2);
+
+if (! function_exists('erotikava_mark_theme_setup_pending')) {
+    function erotikava_mark_theme_setup_pending(): void
+    {
+        update_option('erotikava_theme_setup_pending', 1);
+    }
+}
+add_action('after_switch_theme', 'erotikava_mark_theme_setup_pending');
+
 if (! function_exists('erotikava_register_initial_content_page')) {
     function erotikava_register_initial_content_page(): void
     {
@@ -430,55 +675,291 @@ if (! function_exists('erotikava_register_initial_content_page')) {
 }
 add_action('admin_menu', 'erotikava_register_initial_content_page');
 
+if (! function_exists('erotikava_get_legacy_repeater_count')) {
+    function erotikava_get_legacy_repeater_count(int $post_id, string $field_name): int
+    {
+        $count = (int) get_post_meta($post_id, $field_name, true);
+        return max(0, $count);
+    }
+}
+
+if (! function_exists('erotikava_get_legacy_repeater_value')) {
+    function erotikava_get_legacy_repeater_value(int $post_id, string $meta_key): mixed
+    {
+        return get_post_meta($post_id, $meta_key, true);
+    }
+}
+
+if (! function_exists('erotikava_migrate_legacy_repeater_fields')) {
+    function erotikava_migrate_legacy_repeater_fields(): void
+    {
+        if (! function_exists('update_field')) {
+            return;
+        }
+
+        $limits = erotikava_get_content_limits();
+        $messages = [];
+        $front_page_id = (int) get_option('page_on_front');
+        if ($front_page_id <= 0) {
+            $front_page = get_page_by_path('home');
+            $front_page_id = $front_page instanceof WP_Post ? (int) $front_page->ID : 0;
+        }
+
+        $profile_page = get_page_by_path('profile');
+        $profile_page_id = $profile_page instanceof WP_Post ? (int) $profile_page->ID : 0;
+        $menu_page = get_page_by_path('menu');
+        $menu_page_id = $menu_page instanceof WP_Post ? (int) $menu_page->ID : 0;
+
+        if ($front_page_id > 0) {
+            $slide_count = min(
+                erotikava_get_legacy_repeater_count($front_page_id, 'home_hero_slides'),
+                (int) ($limits['home_hero_slides'] ?? 0)
+            );
+
+            for ($slide_index = 0; $slide_index < $slide_count; $slide_index++) {
+                $base_key = 'home_hero_slides_' . $slide_index;
+                erotikava_seed_fields_if_empty($front_page_id, [
+                    'home_hero_slide_' . ($slide_index + 1) . '_image' => (int) erotikava_get_legacy_repeater_value($front_page_id, $base_key . '_image'),
+                    'home_hero_slide_' . ($slide_index + 1) . '_mobile_image' => (int) erotikava_get_legacy_repeater_value($front_page_id, $base_key . '_mobile_image'),
+                    'home_hero_slide_' . ($slide_index + 1) . '_image_alt' => (string) erotikava_get_legacy_repeater_value($front_page_id, $base_key . '_image_alt'),
+                    'home_hero_slide_' . ($slide_index + 1) . '_link' => erotikava_get_legacy_repeater_value($front_page_id, $base_key . '_link'),
+                ], $messages);
+
+                $caption_count = min(
+                    (int) erotikava_get_legacy_repeater_value($front_page_id, $base_key . '_caption_lines'),
+                    (int) ($limits['home_hero_caption_lines'] ?? 0)
+                );
+
+                for ($line_index = 0; $line_index < $caption_count; $line_index++) {
+                    erotikava_seed_field_if_empty(
+                        $front_page_id,
+                        'home_hero_slide_' . ($slide_index + 1) . '_caption_' . ($line_index + 1),
+                        (string) erotikava_get_legacy_repeater_value($front_page_id, $base_key . '_caption_lines_' . $line_index . '_text'),
+                        $messages
+                    );
+                }
+            }
+
+            $feature_count = min(
+                erotikava_get_legacy_repeater_count($front_page_id, 'home_features'),
+                (int) ($limits['home_features'] ?? 0)
+            );
+
+            for ($feature_index = 0; $feature_index < $feature_count; $feature_index++) {
+                $base_key = 'home_features_' . $feature_index;
+                erotikava_seed_fields_if_empty($front_page_id, [
+                    'home_feature_' . ($feature_index + 1) . '_card_type' => (string) erotikava_get_legacy_repeater_value($front_page_id, $base_key . '_card_type'),
+                    'home_feature_' . ($feature_index + 1) . '_image' => (int) erotikava_get_legacy_repeater_value($front_page_id, $base_key . '_image'),
+                    'home_feature_' . ($feature_index + 1) . '_image_alt' => (string) erotikava_get_legacy_repeater_value($front_page_id, $base_key . '_image_alt'),
+                    'home_feature_' . ($feature_index + 1) . '_title' => (string) erotikava_get_legacy_repeater_value($front_page_id, $base_key . '_title'),
+                    'home_feature_' . ($feature_index + 1) . '_description' => (string) erotikava_get_legacy_repeater_value($front_page_id, $base_key . '_description'),
+                ], $messages);
+            }
+
+            $gallery_count = min(
+                erotikava_get_legacy_repeater_count($front_page_id, 'home_gallery_images'),
+                (int) ($limits['home_gallery_images'] ?? 0)
+            );
+
+            for ($image_index = 0; $image_index < $gallery_count; $image_index++) {
+                $base_key = 'home_gallery_images_' . $image_index;
+                erotikava_seed_fields_if_empty($front_page_id, [
+                    'home_gallery_image_' . ($image_index + 1) => (int) erotikava_get_legacy_repeater_value($front_page_id, $base_key . '_image'),
+                    'home_gallery_image_' . ($image_index + 1) . '_alt' => (string) erotikava_get_legacy_repeater_value($front_page_id, $base_key . '_image_alt'),
+                ], $messages);
+            }
+
+            $news_count = min(
+                erotikava_get_legacy_repeater_count($front_page_id, 'home_news_items'),
+                (int) ($limits['home_news_items'] ?? 0)
+            );
+
+            for ($news_index = 0; $news_index < $news_count; $news_index++) {
+                $base_key = 'home_news_items_' . $news_index;
+                erotikava_seed_fields_if_empty($front_page_id, [
+                    'home_news_item_' . ($news_index + 1) . '_image' => (int) erotikava_get_legacy_repeater_value($front_page_id, $base_key . '_image'),
+                    'home_news_item_' . ($news_index + 1) . '_image_alt' => (string) erotikava_get_legacy_repeater_value($front_page_id, $base_key . '_image_alt'),
+                    'home_news_item_' . ($news_index + 1) . '_link' => erotikava_get_legacy_repeater_value($front_page_id, $base_key . '_link'),
+                    'home_news_item_' . ($news_index + 1) . '_open_new_tab' => (bool) erotikava_get_legacy_repeater_value($front_page_id, $base_key . '_open_new_tab'),
+                ], $messages);
+            }
+        }
+
+        if ($profile_page_id > 0) {
+            $paragraph_count = min(
+                erotikava_get_legacy_repeater_count($profile_page_id, 'profile_intro_paragraphs'),
+                (int) ($limits['profile_intro_paragraphs'] ?? 0)
+            );
+
+            for ($paragraph_index = 0; $paragraph_index < $paragraph_count; $paragraph_index++) {
+                erotikava_seed_field_if_empty(
+                    $profile_page_id,
+                    'profile_intro_paragraph_' . ($paragraph_index + 1),
+                    (string) erotikava_get_legacy_repeater_value($profile_page_id, 'profile_intro_paragraphs_' . $paragraph_index . '_text'),
+                    $messages
+                );
+            }
+
+            $category_count = min(
+                erotikava_get_legacy_repeater_count($profile_page_id, 'profile_categories'),
+                (int) ($limits['profile_categories'] ?? 0)
+            );
+
+            for ($category_index = 0; $category_index < $category_count; $category_index++) {
+                $base_key = 'profile_categories_' . $category_index;
+                erotikava_seed_fields_if_empty($profile_page_id, [
+                    'profile_category_' . ($category_index + 1) . '_eyebrow' => (string) erotikava_get_legacy_repeater_value($profile_page_id, $base_key . '_category_eyebrow'),
+                    'profile_category_' . ($category_index + 1) . '_title' => (string) erotikava_get_legacy_repeater_value($profile_page_id, $base_key . '_category_title'),
+                ], $messages);
+
+                $image_count = min(
+                    (int) erotikava_get_legacy_repeater_value($profile_page_id, $base_key . '_category_images'),
+                    (int) ($limits['profile_category_images'] ?? 0)
+                );
+
+                for ($image_index = 0; $image_index < $image_count; $image_index++) {
+                    erotikava_seed_fields_if_empty($profile_page_id, [
+                        'profile_category_' . ($category_index + 1) . '_image_' . ($image_index + 1) => (int) erotikava_get_legacy_repeater_value($profile_page_id, $base_key . '_category_images_' . $image_index . '_image'),
+                        'profile_category_' . ($category_index + 1) . '_image_' . ($image_index + 1) . '_alt' => (string) erotikava_get_legacy_repeater_value($profile_page_id, $base_key . '_category_images_' . $image_index . '_image_alt'),
+                    ], $messages);
+                }
+            }
+        }
+
+        if ($menu_page_id > 0) {
+            $tab_count = min(
+                erotikava_get_legacy_repeater_count($menu_page_id, 'menu_system_tabs'),
+                (int) ($limits['menu_system_tabs'] ?? 0)
+            );
+
+            for ($tab_index = 0; $tab_index < $tab_count; $tab_index++) {
+                $base_key = 'menu_system_tabs_' . $tab_index;
+                erotikava_seed_field_if_empty(
+                    $menu_page_id,
+                    'menu_system_tab_' . ($tab_index + 1) . '_label',
+                    (string) erotikava_get_legacy_repeater_value($menu_page_id, $base_key . '_tab_label'),
+                    $messages
+                );
+
+                $image_count = min(
+                    (int) erotikava_get_legacy_repeater_value($menu_page_id, $base_key . '_tab_images'),
+                    (int) ($limits['menu_system_tab_images'] ?? 0)
+                );
+
+                for ($image_index = 0; $image_index < $image_count; $image_index++) {
+                    erotikava_seed_fields_if_empty($menu_page_id, [
+                        'menu_system_tab_' . ($tab_index + 1) . '_image_' . ($image_index + 1) => (int) erotikava_get_legacy_repeater_value($menu_page_id, $base_key . '_tab_images_' . $image_index . '_image'),
+                        'menu_system_tab_' . ($tab_index + 1) . '_image_' . ($image_index + 1) . '_alt' => (string) erotikava_get_legacy_repeater_value($menu_page_id, $base_key . '_tab_images_' . $image_index . '_image_alt'),
+                    ], $messages);
+                }
+            }
+
+            $shisha_line_count = min(
+                erotikava_get_legacy_repeater_count($menu_page_id, 'menu_shisha_content'),
+                (int) ($limits['menu_shisha_content'] ?? 0)
+            );
+
+            for ($line_index = 0; $line_index < $shisha_line_count; $line_index++) {
+                $base_key = 'menu_shisha_content_' . $line_index;
+                erotikava_seed_fields_if_empty($menu_page_id, [
+                    'menu_shisha_line_' . ($line_index + 1) . '_text' => (string) erotikava_get_legacy_repeater_value($menu_page_id, $base_key . '_text'),
+                    'menu_shisha_line_' . ($line_index + 1) . '_style' => (string) erotikava_get_legacy_repeater_value($menu_page_id, $base_key . '_style'),
+                ], $messages);
+            }
+
+            $food_count = min(
+                erotikava_get_legacy_repeater_count($menu_page_id, 'menu_food_images'),
+                (int) ($limits['menu_food_images'] ?? 0)
+            );
+
+            for ($image_index = 0; $image_index < $food_count; $image_index++) {
+                $base_key = 'menu_food_images_' . $image_index;
+                erotikava_seed_fields_if_empty($menu_page_id, [
+                    'menu_food_image_' . ($image_index + 1) => (int) erotikava_get_legacy_repeater_value($menu_page_id, $base_key . '_image'),
+                    'menu_food_image_' . ($image_index + 1) . '_alt' => (string) erotikava_get_legacy_repeater_value($menu_page_id, $base_key . '_image_alt'),
+                ], $messages);
+            }
+
+            $drink_gallery_count = min(
+                erotikava_get_legacy_repeater_count($menu_page_id, 'menu_drink_gallery'),
+                (int) ($limits['menu_drink_gallery'] ?? 0)
+            );
+
+            for ($image_index = 0; $image_index < $drink_gallery_count; $image_index++) {
+                $base_key = 'menu_drink_gallery_' . $image_index;
+                erotikava_seed_fields_if_empty($menu_page_id, [
+                    'menu_drink_gallery_image_' . ($image_index + 1) => (int) erotikava_get_legacy_repeater_value($menu_page_id, $base_key . '_image'),
+                    'menu_drink_gallery_image_' . ($image_index + 1) . '_alt' => (string) erotikava_get_legacy_repeater_value($menu_page_id, $base_key . '_image_alt'),
+                ], $messages);
+            }
+        }
+    }
+}
+add_action('acf/init', 'erotikava_migrate_legacy_repeater_fields', 20);
+
 if (! function_exists('erotikava_import_initial_content')) {
     function erotikava_import_initial_content(): array
     {
         $messages = [];
         $defaults = erotikava_get_default_theme_content();
+        $limits = erotikava_get_content_limits();
 
         if (! function_exists('update_field')) {
-            return ['ACF PROが有効ではないため、初期データを投入できません。'];
+            return ['ACFが有効ではないため、初期データを投入できません。'];
         }
 
-        $front_page_id = erotikava_find_or_create_page('home', 'トップ');
-        $reservations_page_id = erotikava_find_or_create_page('reservations', 'イベント・日程', 'page-reservations.php');
-        $profile_page_id = erotikava_find_or_create_page('profile', 'プロフィール', 'page-profile.php');
-        $menu_page_id = erotikava_find_or_create_page('menu', 'メニュー・料金', 'page-menu.php');
-
-        update_option('show_on_front', 'page');
-        update_option('page_on_front', $front_page_id);
+        $page_ids = erotikava_sync_theme_pages();
+        $front_page_id = (int) ($page_ids['home'] ?? 0);
+        $reservations_page_id = (int) ($page_ids['reservations'] ?? 0);
+        $profile_page_id = (int) ($page_ids['profile'] ?? 0);
+        $menu_page_id = (int) ($page_ids['menu'] ?? 0);
 
         $messages[] = '固定ページの作成とフロントページ設定を確認しました。';
 
         $home = $defaults['home'];
-        $hero_slides = [];
-        foreach ($home['hero_slides'] as $slide) {
-            $hero_slides[] = [
+        foreach ($home['hero_slides'] as $slide_index => $slide) {
+            $field_values = [
                 'image' => erotikava_import_media_asset($slide['image'], $messages),
                 'mobile_image' => $slide['mobile_image'] !== '' ? erotikava_import_media_asset($slide['mobile_image'], $messages) : 0,
                 'image_alt' => $slide['image_alt'],
-                'caption_lines' => $slide['caption_lines'],
                 'link' => [],
             ];
+
+            erotikava_seed_fields_if_empty($front_page_id, [
+                'home_hero_slide_' . ($slide_index + 1) . '_image' => $field_values['image'],
+                'home_hero_slide_' . ($slide_index + 1) . '_mobile_image' => $field_values['mobile_image'],
+                'home_hero_slide_' . ($slide_index + 1) . '_image_alt' => $field_values['image_alt'],
+                'home_hero_slide_' . ($slide_index + 1) . '_link' => $field_values['link'],
+            ], $messages);
+
+            foreach (($slide['caption_lines'] ?? []) as $line_index => $line) {
+                if ($line_index >= (int) ($limits['home_hero_caption_lines'] ?? 0)) {
+                    break;
+                }
+
+                erotikava_seed_field_if_empty(
+                    $front_page_id,
+                    'home_hero_slide_' . ($slide_index + 1) . '_caption_' . ($line_index + 1),
+                    (string) ($line['text'] ?? ''),
+                    $messages
+                );
+            }
         }
-        erotikava_seed_field_if_empty($front_page_id, 'home_hero_slides', $hero_slides, $messages);
         erotikava_seed_field_if_empty($front_page_id, 'home_intro_title', $home['intro_title'], $messages);
         erotikava_seed_field_if_empty($front_page_id, 'home_intro_lead', $home['intro_lead'], $messages);
         erotikava_seed_field_if_empty($front_page_id, 'home_intro_hours_badge', $home['intro_hours_badge'], $messages);
         erotikava_seed_field_if_empty($front_page_id, 'home_intro_cta_text', $home['intro_cta_text'], $messages);
         erotikava_seed_field_if_empty($front_page_id, 'home_intro_cta_link', erotikava_make_link_value(erotikava_get_page_url('reservations') . '#event-calendar', $home['intro_cta_text']), $messages);
 
-        $features = [];
-        foreach ($home['features'] as $feature) {
-            $features[] = [
-                'card_type' => $feature['card_type'],
-                'image' => erotikava_import_media_asset($feature['image'], $messages),
-                'image_alt' => $feature['image_alt'],
-                'title' => $feature['title'],
-                'description' => $feature['description'],
-            ];
+        foreach ($home['features'] as $feature_index => $feature) {
+            erotikava_seed_fields_if_empty($front_page_id, [
+                'home_feature_' . ($feature_index + 1) . '_card_type' => $feature['card_type'],
+                'home_feature_' . ($feature_index + 1) . '_image' => erotikava_import_media_asset($feature['image'], $messages),
+                'home_feature_' . ($feature_index + 1) . '_image_alt' => $feature['image_alt'],
+                'home_feature_' . ($feature_index + 1) . '_title' => $feature['title'],
+                'home_feature_' . ($feature_index + 1) . '_description' => $feature['description'],
+            ], $messages);
         }
-        erotikava_seed_field_if_empty($front_page_id, 'home_features', $features, $messages);
         erotikava_seed_field_if_empty($front_page_id, 'home_concept_eyebrow', $home['concept_eyebrow'], $messages);
         erotikava_seed_field_if_empty($front_page_id, 'home_concept_title', $home['concept_title'], $messages);
         erotikava_seed_field_if_empty($front_page_id, 'home_concept_text', $home['concept_text'], $messages);
@@ -487,27 +968,23 @@ if (! function_exists('erotikava_import_initial_content')) {
         erotikava_seed_field_if_empty($front_page_id, 'home_gallery_eyebrow', $home['gallery_eyebrow'], $messages);
         erotikava_seed_field_if_empty($front_page_id, 'home_gallery_title', $home['gallery_title'], $messages);
 
-        $gallery_images = [];
-        foreach ($home['gallery_images'] as $image) {
-            $gallery_images[] = [
-                'image' => erotikava_import_media_asset($image['image'], $messages),
-                'image_alt' => $image['image_alt'],
-            ];
+        foreach ($home['gallery_images'] as $image_index => $image) {
+            erotikava_seed_fields_if_empty($front_page_id, [
+                'home_gallery_image_' . ($image_index + 1) => erotikava_import_media_asset($image['image'], $messages),
+                'home_gallery_image_' . ($image_index + 1) . '_alt' => $image['image_alt'],
+            ], $messages);
         }
-        erotikava_seed_field_if_empty($front_page_id, 'home_gallery_images', $gallery_images, $messages);
         erotikava_seed_field_if_empty($front_page_id, 'home_news_eyebrow', $home['news_eyebrow'], $messages);
         erotikava_seed_field_if_empty($front_page_id, 'home_news_title', $home['news_title'], $messages);
 
-        $news_items = [];
-        foreach ($home['news_items'] as $news_item) {
-            $news_items[] = [
-                'image' => erotikava_import_media_asset($news_item['image'], $messages),
-                'image_alt' => $news_item['image_alt'],
-                'link' => [],
-                'open_new_tab' => 0,
-            ];
+        foreach ($home['news_items'] as $news_index => $news_item) {
+            erotikava_seed_fields_if_empty($front_page_id, [
+                'home_news_item_' . ($news_index + 1) . '_image' => erotikava_import_media_asset($news_item['image'], $messages),
+                'home_news_item_' . ($news_index + 1) . '_image_alt' => $news_item['image_alt'],
+                'home_news_item_' . ($news_index + 1) . '_link' => [],
+                'home_news_item_' . ($news_index + 1) . '_open_new_tab' => 0,
+            ], $messages);
         }
-        erotikava_seed_field_if_empty($front_page_id, 'home_news_items', $news_items, $messages);
 
         foreach (['reservations' => $reservations_page_id, 'profile' => $profile_page_id, 'menu' => $menu_page_id] as $page_key => $page_id) {
             $page_defaults = $defaults[$page_key];
@@ -535,46 +1012,49 @@ if (! function_exists('erotikava_import_initial_content')) {
         $profile = $defaults['profile'];
         erotikava_seed_field_if_empty($profile_page_id, 'profile_intro_eyebrow', $profile['intro_eyebrow'], $messages);
         erotikava_seed_field_if_empty($profile_page_id, 'profile_intro_title', $profile['intro_title'], $messages);
-        erotikava_seed_field_if_empty($profile_page_id, 'profile_intro_paragraphs', $profile['intro_paragraphs'], $messages);
+        foreach ($profile['intro_paragraphs'] as $paragraph_index => $paragraph) {
+            erotikava_seed_field_if_empty(
+                $profile_page_id,
+                'profile_intro_paragraph_' . ($paragraph_index + 1),
+                (string) ($paragraph['text'] ?? ''),
+                $messages
+            );
+        }
         erotikava_seed_field_if_empty($profile_page_id, 'profile_section_eyebrow', $profile['section_eyebrow'], $messages);
         erotikava_seed_field_if_empty($profile_page_id, 'profile_section_title', $profile['section_title'], $messages);
 
-        $profile_categories = [];
-        foreach ($profile['categories'] as $category) {
-            $images = [];
-            foreach ($category['category_images'] as $image) {
-                $images[] = [
-                    'image' => erotikava_import_media_asset($image['image'], $messages),
-                    'image_alt' => $image['image_alt'],
-                ];
-            }
+        foreach ($profile['categories'] as $category_index => $category) {
+            erotikava_seed_fields_if_empty($profile_page_id, [
+                'profile_category_' . ($category_index + 1) . '_eyebrow' => $category['category_eyebrow'],
+                'profile_category_' . ($category_index + 1) . '_title' => $category['category_title'],
+            ], $messages);
 
-            $profile_categories[] = [
-                'category_eyebrow' => $category['category_eyebrow'],
-                'category_title' => $category['category_title'],
-                'category_images' => $images,
-            ];
+            foreach ($category['category_images'] as $image_index => $image) {
+                erotikava_seed_fields_if_empty($profile_page_id, [
+                    'profile_category_' . ($category_index + 1) . '_image_' . ($image_index + 1) => erotikava_import_media_asset($image['image'], $messages),
+                    'profile_category_' . ($category_index + 1) . '_image_' . ($image_index + 1) . '_alt' => $image['image_alt'],
+                ], $messages);
+            }
         }
-        erotikava_seed_field_if_empty($profile_page_id, 'profile_categories', $profile_categories, $messages);
 
         $menu = $defaults['menu'];
         erotikava_seed_field_if_empty($menu_page_id, 'menu_system_eyebrow', $menu['system_eyebrow'], $messages);
         erotikava_seed_field_if_empty($menu_page_id, 'menu_system_title', $menu['system_title'], $messages);
-        $system_tabs = [];
-        foreach ($menu['system_tabs'] as $tab) {
-            $tab_images = [];
-            foreach ($tab['tab_images'] as $image) {
-                $tab_images[] = [
-                    'image' => erotikava_import_media_asset($image['image'], $messages),
-                    'image_alt' => $image['image_alt'],
-                ];
+        foreach ($menu['system_tabs'] as $tab_index => $tab) {
+            erotikava_seed_field_if_empty(
+                $menu_page_id,
+                'menu_system_tab_' . ($tab_index + 1) . '_label',
+                $tab['tab_label'],
+                $messages
+            );
+
+            foreach ($tab['tab_images'] as $image_index => $image) {
+                erotikava_seed_fields_if_empty($menu_page_id, [
+                    'menu_system_tab_' . ($tab_index + 1) . '_image_' . ($image_index + 1) => erotikava_import_media_asset($image['image'], $messages),
+                    'menu_system_tab_' . ($tab_index + 1) . '_image_' . ($image_index + 1) . '_alt' => $image['image_alt'],
+                ], $messages);
             }
-            $system_tabs[] = [
-                'tab_label' => $tab['tab_label'],
-                'tab_images' => $tab_images,
-            ];
         }
-        erotikava_seed_field_if_empty($menu_page_id, 'menu_system_tabs', $system_tabs, $messages);
         erotikava_seed_field_if_empty($menu_page_id, 'menu_vip_image', erotikava_import_media_asset($menu['vip_image'], $messages), $messages);
         erotikava_seed_field_if_empty($menu_page_id, 'menu_vip_image_alt', $menu['vip_image_alt'], $messages);
         erotikava_seed_field_if_empty($menu_page_id, 'menu_vip_eyebrow', $menu['vip_eyebrow'], $messages);
@@ -583,19 +1063,22 @@ if (! function_exists('erotikava_import_initial_content')) {
         erotikava_seed_field_if_empty($menu_page_id, 'menu_vip_campaign_text', $menu['vip_campaign_text'], $messages);
         erotikava_seed_field_if_empty($menu_page_id, 'menu_shisha_eyebrow', $menu['shisha_eyebrow'], $messages);
         erotikava_seed_field_if_empty($menu_page_id, 'menu_shisha_title', $menu['shisha_title'], $messages);
-        erotikava_seed_field_if_empty($menu_page_id, 'menu_shisha_content', $menu['shisha_content'], $messages);
+        foreach ($menu['shisha_content'] as $line_index => $line) {
+            erotikava_seed_fields_if_empty($menu_page_id, [
+                'menu_shisha_line_' . ($line_index + 1) . '_text' => (string) ($line['text'] ?? ''),
+                'menu_shisha_line_' . ($line_index + 1) . '_style' => (string) ($line['style'] ?? 'normal'),
+            ], $messages);
+        }
         erotikava_seed_field_if_empty($menu_page_id, 'menu_shisha_image', erotikava_import_media_asset($menu['shisha_image'], $messages), $messages);
         erotikava_seed_field_if_empty($menu_page_id, 'menu_shisha_image_alt', $menu['shisha_image_alt'], $messages);
         erotikava_seed_field_if_empty($menu_page_id, 'menu_food_eyebrow', $menu['food_eyebrow'], $messages);
         erotikava_seed_field_if_empty($menu_page_id, 'menu_food_title', $menu['food_title'], $messages);
-        $food_images = [];
-        foreach ($menu['food_images'] as $image) {
-            $food_images[] = [
-                'image' => erotikava_import_media_asset($image['image'], $messages),
-                'image_alt' => $image['image_alt'],
-            ];
+        foreach ($menu['food_images'] as $image_index => $image) {
+            erotikava_seed_fields_if_empty($menu_page_id, [
+                'menu_food_image_' . ($image_index + 1) => erotikava_import_media_asset($image['image'], $messages),
+                'menu_food_image_' . ($image_index + 1) . '_alt' => $image['image_alt'],
+            ], $messages);
         }
-        erotikava_seed_field_if_empty($menu_page_id, 'menu_food_images', $food_images, $messages);
         erotikava_seed_field_if_empty($menu_page_id, 'menu_drink_eyebrow', $menu['drink_eyebrow'], $messages);
         erotikava_seed_field_if_empty($menu_page_id, 'menu_drink_title', $menu['drink_title'], $messages);
         erotikava_seed_field_if_empty($menu_page_id, 'menu_drink_main_image', erotikava_import_media_asset($menu['drink_main_image'], $messages), $messages);
@@ -605,14 +1088,12 @@ if (! function_exists('erotikava_import_initial_content')) {
         erotikava_seed_field_if_empty($menu_page_id, 'menu_drink_description', $menu['drink_description'], $messages);
         erotikava_seed_field_if_empty($menu_page_id, 'menu_drink_types_text', $menu['drink_types_text'], $messages);
         erotikava_seed_field_if_empty($menu_page_id, 'menu_drink_note', $menu['drink_note'], $messages);
-        $drink_gallery = [];
-        foreach ($menu['drink_gallery'] as $image) {
-            $drink_gallery[] = [
-                'image' => erotikava_import_media_asset($image['image'], $messages),
-                'image_alt' => $image['image_alt'],
-            ];
+        foreach ($menu['drink_gallery'] as $image_index => $image) {
+            erotikava_seed_fields_if_empty($menu_page_id, [
+                'menu_drink_gallery_image_' . ($image_index + 1) => erotikava_import_media_asset($image['image'], $messages),
+                'menu_drink_gallery_image_' . ($image_index + 1) . '_alt' => $image['image_alt'],
+            ], $messages);
         }
-        erotikava_seed_field_if_empty($menu_page_id, 'menu_drink_gallery', $drink_gallery, $messages);
 
         $post_type = erotikava_get_event_post_type();
         $pending_field = $post_type === 'event_calendar' ? 'event_note' : 'event_pending_note';
@@ -663,6 +1144,33 @@ if (! function_exists('erotikava_import_initial_content')) {
         return $messages;
     }
 }
+
+if (! function_exists('erotikava_maybe_bootstrap_theme_content')) {
+    function erotikava_maybe_bootstrap_theme_content(): void
+    {
+        if (! is_admin() || ! current_user_can('manage_options')) {
+            return;
+        }
+
+        $current_version = (string) get_option('erotikava_theme_bootstrap_version', '');
+        $pending = (bool) get_option('erotikava_theme_setup_pending', false);
+        $imported = (bool) get_option('erotikava_initial_content_imported', false);
+
+        if (! $pending && $current_version === EROTIKAVA_THEME_VERSION && $imported) {
+            return;
+        }
+
+        erotikava_sync_theme_pages();
+
+        if (function_exists('update_field')) {
+            erotikava_import_initial_content();
+        }
+
+        update_option('erotikava_theme_bootstrap_version', EROTIKAVA_THEME_VERSION);
+        delete_option('erotikava_theme_setup_pending');
+    }
+}
+add_action('admin_init', 'erotikava_maybe_bootstrap_theme_content');
 
 if (! function_exists('erotikava_render_initial_content_page')) {
     function erotikava_render_initial_content_page(): void
